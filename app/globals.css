@@ -547,8 +547,16 @@ body.hub-active::before, body.hub-active::after { display: none; }
 .feature-icon {
   width: 52px; height: 52px; border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 24px; margin-bottom: 20px;
+  color: var(--accent); margin-bottom: 20px;
   background: var(--grad-soft); border: 1px solid var(--border);
+}
+/* "How it works" reuses .feature-card/.feature-icon for numbered steps
+   instead of the 1/2/3 keycap emoji they used to hold -- a real numeral in
+   the same chip, set in the display face so it reads as a deliberate step
+   marker rather than a leftover icon slot. */
+.step-icon {
+  font-family: var(--font-display); font-size: 22px; font-weight: 700;
+  font-style: italic; line-height: 1;
 }
 .feature-title { font-size: 1.08rem; font-weight: 700; letter-spacing: -.02em; color: var(--text-0); margin: 0 0 10px; }
 .feature-desc { font-size: 0.9rem; color: var(--text-1); line-height: 1.65; margin: 0; }
@@ -568,12 +576,23 @@ body.hub-active::before, body.hub-active::after { display: none; }
   text-decoration: none; color: var(--text-1);
   transition: transform .25s ease, border-color .25s ease, background .25s ease;
 }
+/* Top accent bar, echoing the hub's .tool-card::after -- faint at rest so
+   the grid reads as a considered system rather than a flat list, full
+   brightness on hover. Ties the marketing tiles to the product's own card
+   language instead of the two surfaces looking unrelated. */
+.cat-card::after {
+  content: ""; position: absolute; left: 0; top: 0; right: 0; height: 2px;
+  background: var(--grad); opacity: .18; transition: opacity .25s ease;
+}
 .cat-card:hover { transform: translateY(-3px); background: var(--surface-hover); border-color: rgba(201,161,90,.4); color: var(--text-0); }
+.cat-card:hover::after { opacity: 1; }
 .cat-icon {
   width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-  background: var(--grad-soft); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; font-size: 21px;
+  background: var(--grad-soft); border: 1px solid var(--border); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  transition: color .25s ease;
 }
+.cat-card:hover .cat-icon { color: var(--brass-bright); }
 .cat-info { min-width: 0; }
 .cat-name { font-size: 0.88rem; font-weight: 650; letter-spacing: -.01em; color: var(--text-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
 .cat-count { font-size: 0.75rem; color: var(--text-2); font-weight: 500; }
@@ -655,7 +674,8 @@ body.hub-active::before, body.hub-active::after { display: none; }
 .contact-method-value { font-size: 0.8rem; color: var(--text-2); }
 
 .contact-note { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; font-size: 13px; color: var(--text-1); line-height: 1.6; }
-.contact-note strong { color: var(--text-0); display: block; margin-bottom: 4px; }
+.contact-note strong { color: var(--text-0); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.contact-note-icon { color: var(--accent); flex-shrink: 0; }
 
 .contact-form-card {
   position: relative; overflow: hidden;
@@ -730,15 +750,30 @@ body.hub-active::before, body.hub-active::after { display: none; }
 .about-story a { color: var(--accent); text-decoration: underline; }
 
 .tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: var(--maxw); margin: 0 auto; }
-.tech-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; transition: border-color .25s ease, background .25s ease, transform .25s ease; }
+.tech-card { position: relative; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; transition: border-color .25s ease, background .25s ease, transform .25s ease; }
+/* Same top accent bar as .cat-card/.tool-card (hub) -- one visual language
+   for "card" across the whole product, not three unrelated treatments. */
+.tech-card::after, .value-card::after {
+  content: ""; position: absolute; left: 0; top: 0; right: 0; height: 2px;
+  background: var(--grad); opacity: .18; transition: opacity .25s ease;
+}
 .tech-card:hover { border-color: rgba(201,161,90,.4); background: var(--surface-hover); transform: translateY(-3px); }
-.tech-card-icon { font-size: 28px; margin-bottom: 14px; }
+.tech-card:hover::after, .value-card:hover::after { opacity: 1; }
+/* Bare 28px emoji glyphs read flat next to the category tiles' proper icon
+   chips -- give the About cards the same chip treatment (soft-gradient
+   square, bordered, brass icon) instead of an oversized floating glyph. */
+.tech-card-icon, .value-icon {
+  width: 46px; height: 46px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--grad-soft); border: 1px solid var(--border); color: var(--accent);
+  margin-bottom: 16px;
+}
 .tech-card-name { font-size: 1rem; font-weight: 750; letter-spacing: -.02em; color: var(--text-0); margin-bottom: 8px; }
 .tech-card-desc { font-size: 0.86rem; color: var(--text-1); line-height: 1.6; margin: 0; }
 
 .values-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 920px; margin: 0 auto; }
-.value-card { padding: 32px; background: var(--grad-soft); border: 1px solid var(--border-strong); border-radius: 18px; }
-.value-icon { font-size: 28px; margin-bottom: 14px; }
+.value-card { position: relative; overflow: hidden; padding: 32px; background: var(--grad-soft); border: 1px solid var(--border-strong); border-radius: 18px; transition: transform .25s ease, border-color .25s ease; }
+.value-card:hover { transform: translateY(-3px); border-color: rgba(201,161,90,.5); }
 .value-title { font-size: 1.05rem; font-weight: 750; color: var(--text-0); margin-bottom: 8px; }
 .value-desc { font-size: 0.88rem; color: var(--text-1); line-height: 1.65; margin: 0; }
 @media (max-width: 768px) { .tech-grid { grid-template-columns: 1fr 1fr; } .values-grid { grid-template-columns: 1fr; } }

@@ -4,6 +4,10 @@ import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
 import Effects from "@/components/Effects";
 import { getCatalogStats } from "@/lib/catalogStats";
+import {
+  IconTriangle, IconAtom, IconBrush, IconSearch, IconSave, IconGlobe,
+  IconGauge, IconUnlock, IconBadgeCheck, IconKeyboard,
+} from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "About",
@@ -17,21 +21,21 @@ const PORTFOLIO = "https://ivy-cave-ef2.notion.site/Surya-L-147e68f554e280e2809f
 
 function buildTech(stats: ReturnType<typeof getCatalogStats>) {
   return [
-    { icon: "▲", name: "Next.js 15", desc: "App Router, React Server Components, and an optimized production build. One dev server, proper routing, no more file:// gotchas." },
-    { icon: "⚛️", name: "React 19", desc: "The marketing pages are React components; the hub mounts its catalog logic in a client component with hooks for lifecycle." },
-    { icon: "🎨", name: "Hand-written CSS", desc: "A custom dark design system with CSS variables, no UI kit. Gradients, glass, and animation built from scratch." },
-    { icon: "🔍", name: "Fuzzy Search Engine", desc: "Custom Levenshtein edit-distance matching with synonym expansion and a pre-compiled index. No external search library." },
-    { icon: "💾", name: "localStorage", desc: "Favorites, density, and last-visited section persist across sessions, with graceful fallback when storage is blocked." },
-    { icon: "🌐", name: "Static-friendly data", desc: `${stats.dataSizeMB} MB of catalog data served from /public, loaded once per session and cached by the browser.` },
+    { icon: IconTriangle, name: "Next.js 15", desc: "App Router, React Server Components, and an optimized production build. One dev server, proper routing, no more file:// gotchas." },
+    { icon: IconAtom, name: "React 19", desc: "The marketing pages are React components; the hub mounts its catalog logic in a client component with hooks for lifecycle." },
+    { icon: IconBrush, name: "Hand-written CSS", desc: "A custom dark design system with CSS variables, no UI kit. Gradients, glass, and animation built from scratch." },
+    { icon: IconSearch, name: "Fuzzy Search Engine", desc: "Custom Levenshtein edit-distance matching with synonym expansion and a pre-compiled index. No external search library." },
+    { icon: IconSave, name: "localStorage", desc: "Favorites, density, and last-visited section persist across sessions, with graceful fallback when storage is blocked." },
+    { icon: IconGlobe, name: "Static-friendly data", desc: `${stats.dataSizeMB} MB of catalog data served from /public, loaded once per session and cached by the browser.` },
   ];
 }
 
 function buildValues(stats: ReturnType<typeof getCatalogStats>) {
   return [
-    { icon: "🚀", title: "It has to be fast", desc: "Data loads on demand, assets are split, and the search index is built ahead of time so nothing is crunched while you wait." },
-    { icon: "🔓", title: "No walls", desc: "No login, no limits, no paywall. You shouldn't have to hand over an email just to look something up." },
-    { icon: "✅", title: "Quality over quantity", desc: `I'd rather have ${stats.totalTools.toLocaleString()} tools I've actually checked than 20,000 scraped entries full of dead links and duplicates.` },
-    { icon: "♿", title: "Works without a mouse", desc: "Keyboard navigation throughout, with proper ARIA roles, focus handling, and skip links, not bolted on as an afterthought." },
+    { icon: IconGauge, title: "It has to be fast", desc: "Data loads on demand, assets are split, and the search index is built ahead of time so nothing is crunched while you wait." },
+    { icon: IconUnlock, title: "No walls", desc: "No login, no limits, no paywall. You shouldn't have to hand over an email just to look something up." },
+    { icon: IconBadgeCheck, title: "Quality over quantity", desc: `I'd rather have ${stats.totalTools.toLocaleString()} tools I've actually checked than 20,000 scraped entries full of dead links and duplicates.` },
+    { icon: IconKeyboard, title: "Works without a mouse", desc: "Keyboard navigation throughout, with proper ARIA roles, focus handling, and skip links, not bolted on as an afterthought." },
   ];
 }
 
@@ -94,7 +98,7 @@ export default function About() {
           <div className="tech-grid">
             {TECH.map((t, i) => (
               <div className="tech-card reveal" key={t.name} style={{ "--delay": `${(i % 3) * 80}ms` }}>
-                <div className="tech-card-icon" aria-hidden="true">{t.icon}</div>
+                <div className="tech-card-icon" aria-hidden="true"><t.icon width={22} height={22} /></div>
                 <div className="tech-card-name">{t.name}</div>
                 <p className="tech-card-desc">{t.desc}</p>
               </div>
@@ -113,7 +117,7 @@ export default function About() {
           <div className="values-grid">
             {VALUES.map((v, i) => (
               <div className="value-card reveal" key={v.title} style={{ "--delay": `${(i % 2) * 80}ms` }}>
-                <div className="value-icon" aria-hidden="true">{v.icon}</div>
+                <div className="value-icon" aria-hidden="true"><v.icon width={22} height={22} /></div>
                 <div className="value-title">{v.title}</div>
                 <p className="value-desc">{v.desc}</p>
               </div>

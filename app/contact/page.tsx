@@ -4,6 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Effects from "@/components/Effects";
 import ContactForm from "@/components/ContactForm";
 import Faq from "@/components/Faq";
+import { IconWrench, IconBug, IconClock } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -47,17 +48,17 @@ export default function Contact() {
               <div><div className="contact-method-title">GitHub Issues</div><div className="contact-method-value">github.com/Surya8991/ToolAtlas (preferred)</div></div>
             </a>
             <a href={`${REPO}/issues/new?labels=tool-request`} target="_blank" rel="noopener noreferrer" className="contact-method" aria-label="Suggest a tool to add">
-              <div className="contact-method-icon" aria-hidden="true">🔧</div>
+              <div className="contact-method-icon" aria-hidden="true"><IconWrench width={20} height={20} /></div>
               <div><div className="contact-method-title">Suggest a Tool</div><div className="contact-method-value">Open a Tool Request issue on GitHub</div></div>
             </a>
             <a href={`${REPO}/issues/new?labels=bug`} target="_blank" rel="noopener noreferrer" className="contact-method" aria-label="Report a bug">
-              <div className="contact-method-icon" aria-hidden="true">🐛</div>
+              <div className="contact-method-icon" aria-hidden="true"><IconBug width={20} height={20} /></div>
               <div><div className="contact-method-title">Report a Bug</div><div className="contact-method-value">Open a Bug Report issue on GitHub</div></div>
             </a>
           </div>
 
           <div className="contact-note">
-            <strong>⏱ Response times</strong>
+            <strong><IconClock width={15} height={15} className="contact-note-icon" /> Response times</strong>
             I usually get to GitHub issues within a couple of days. The form opens your email client, and replies to those take a bit longer, but I do get to them.
           </div>
         </div>

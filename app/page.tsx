@@ -3,6 +3,11 @@ import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
 import Effects from "@/components/Effects";
 import { getCatalogStats } from "@/lib/catalogStats";
+import {
+  IconPen, IconCode, IconImage, IconTrendingUp, IconClapper, IconNotepad, IconLayout, IconArrowRight,
+  IconWindow, IconServer, IconDatabase, IconCloud, IconPhone, IconFlask, IconShieldLock,
+  IconSearch, IconScales, IconStar, IconLink, IconShield,
+} from "@/components/icons";
 
 const MARQUEE = [
   "ChatGPT", "Claude", "Midjourney", "GitHub Copilot", "Figma", "Notion AI",
@@ -13,28 +18,28 @@ const MARQUEE = [
 function buildAiCats(stats: ReturnType<typeof getCatalogStats>) {
   const c = stats.toolCategoryCounts;
   return [
-    { icon: "✍️", name: "Writing & Copy", count: `${c["tool-cat-writing"]} tools`, href: "/hub#tools/tool-cat-writing" },
-    { icon: "💻", name: "Coding & Dev", count: `${c["tool-cat-coding"]} tools`, href: "/hub#tools/tool-cat-coding" },
-    { icon: "🎨", name: "Image Generation", count: `${c["tool-cat-image"]} tools`, href: "/hub#tools/tool-cat-image" },
-    { icon: "📈", name: "SEO & Marketing", count: `${c["tool-cat-seo"] + c["tool-cat-marketing"]} tools`, href: "/hub#tools/tool-cat-seo" },
-    { icon: "🎬", name: "Video & Audio", count: `${c["tool-cat-video"] + c["tool-cat-audio"]} tools`, href: "/hub#tools/tool-cat-video" },
-    { icon: "📝", name: "Meeting Notes", count: `${c["tool-cat-meeting"]} tools`, href: "/hub#tools/tool-cat-meeting" },
-    { icon: "🖌️", name: "Design & UI", count: `${c["tool-cat-design"]} tools`, href: "/hub#tools/tool-cat-design" },
-    { icon: "⚡", name: "View all →", count: `${stats.totalTools.toLocaleString()} total`, href: "/hub" },
+    { icon: IconPen, name: "Writing & Copy", count: `${c["tool-cat-writing"]} tools`, href: "/hub#tools/tool-cat-writing" },
+    { icon: IconCode, name: "Coding & Dev", count: `${c["tool-cat-coding"]} tools`, href: "/hub#tools/tool-cat-coding" },
+    { icon: IconImage, name: "Image Generation", count: `${c["tool-cat-image"]} tools`, href: "/hub#tools/tool-cat-image" },
+    { icon: IconTrendingUp, name: "SEO & Marketing", count: `${c["tool-cat-seo"] + c["tool-cat-marketing"]} tools`, href: "/hub#tools/tool-cat-seo" },
+    { icon: IconClapper, name: "Video & Audio", count: `${c["tool-cat-video"] + c["tool-cat-audio"]} tools`, href: "/hub#tools/tool-cat-video" },
+    { icon: IconNotepad, name: "Meeting Notes", count: `${c["tool-cat-meeting"]} tools`, href: "/hub#tools/tool-cat-meeting" },
+    { icon: IconLayout, name: "Design & UI", count: `${c["tool-cat-design"]} tools`, href: "/hub#tools/tool-cat-design" },
+    { icon: IconArrowRight, name: "View all", count: `${stats.totalTools.toLocaleString()} total`, href: "/hub" },
   ];
 }
 
 function buildTechCats(stats: ReturnType<typeof getCatalogStats>) {
   const c = stats.techTileCounts;
   return [
-    { icon: "🌐", name: "Frontend", count: `${c.frontend} items`, href: "/hub#tech/frontend_ui" },
-    { icon: "⚙️", name: "Backend & APIs", count: `${c.backend} items`, href: "/hub#tech/backend_servers" },
-    { icon: "🗄️", name: "Databases", count: `${c.databases} items`, href: "/hub#tech/databases_storage_search" },
-    { icon: "🚀", name: "DevOps & Cloud", count: `${c.devops} items`, href: "/hub#tech/devops_infra" },
-    { icon: "📱", name: "Mobile", count: `${c.mobile} items`, href: "/hub#tech/mobile_desktop" },
-    { icon: "🧪", name: "Testing & QA", count: `${c.testing} items`, href: "/hub#tech/testing_qa" },
-    { icon: "🔒", name: "Security & Auth", count: `${c.security} items`, href: "/hub#tech/security_auth_identity" },
-    { icon: "🛠️", name: "View all →", count: `${stats.totalTech.toLocaleString()} total`, href: "/hub#tech" },
+    { icon: IconWindow, name: "Frontend", count: `${c.frontend} items`, href: "/hub#tech/frontend_ui" },
+    { icon: IconServer, name: "Backend & APIs", count: `${c.backend} items`, href: "/hub#tech/backend_servers" },
+    { icon: IconDatabase, name: "Databases", count: `${c.databases} items`, href: "/hub#tech/databases_storage_search" },
+    { icon: IconCloud, name: "DevOps & Cloud", count: `${c.devops} items`, href: "/hub#tech/devops_infra" },
+    { icon: IconPhone, name: "Mobile", count: `${c.mobile} items`, href: "/hub#tech/mobile_desktop" },
+    { icon: IconFlask, name: "Testing & QA", count: `${c.testing} items`, href: "/hub#tech/testing_qa" },
+    { icon: IconShieldLock, name: "Security & Auth", count: `${c.security} items`, href: "/hub#tech/security_auth_identity" },
+    { icon: IconArrowRight, name: "View all", count: `${stats.totalTech.toLocaleString()} total`, href: "/hub#tech" },
   ];
 }
 
@@ -190,27 +195,27 @@ export default function Home() {
           </div>
           <div className="features-grid bento" data-spotlight>
             <div className="feature-card span-2 reveal">
-              <div className="feature-icon" aria-hidden="true">🔍</div>
+              <div className="feature-icon" aria-hidden="true"><IconSearch width={24} height={24} /></div>
               <h3 className="feature-title">Fuzzy Global Search</h3>
               <p className="feature-desc">Fat-finger a name and it still finds it. Typo-tolerant matching with synonyms across all {stats.totalItems.toLocaleString()} entries, fully keyboard-driven. Hit <kbd>Ctrl</kbd>+<kbd>K</kbd> from anywhere.</p>
             </div>
             <div className="feature-card reveal" style={{ "--delay": "80ms" }}>
-              <div className="feature-icon" aria-hidden="true">⚖️</div>
+              <div className="feature-icon" aria-hidden="true"><IconScales width={24} height={24} /></div>
               <h3 className="feature-title">Comparison Matrix</h3>
               <p className="feature-desc">Select tools for a side-by-side comparison of pricing, features, and tags in a clean matrix.</p>
             </div>
             <div className="feature-card reveal">
-              <div className="feature-icon" aria-hidden="true">⭐</div>
+              <div className="feature-icon" aria-hidden="true"><IconStar width={24} height={24} /></div>
               <h3 className="feature-title">Favorites &amp; Export</h3>
               <p className="feature-desc">Save tools across sessions and export your shortlist as JSON or CSV for your own workflows.</p>
             </div>
             <div className="feature-card reveal" style={{ "--delay": "80ms" }}>
-              <div className="feature-icon" aria-hidden="true">🔗</div>
+              <div className="feature-icon" aria-hidden="true"><IconLink width={24} height={24} /></div>
               <h3 className="feature-title">Deep Links</h3>
               <p className="feature-desc">Every category, tool, and filter state is shareable via URL. Bookmark any view or send it on.</p>
             </div>
             <div className="feature-card span-2 reveal" style={{ "--delay": "160ms" }}>
-              <div className="feature-icon" aria-hidden="true">🛡️</div>
+              <div className="feature-icon" aria-hidden="true"><IconShield width={24} height={24} /></div>
               <h3 className="feature-title">Density Controls &amp; Resilient UI</h3>
               <p className="feature-desc">Pick Compact, Default, or Comfortable to fit your screen. When a favicon won&apos;t load, a color-coded letter avatar stands in so you never see a broken image. Keyboard-navigable throughout, with proper ARIA roles and skip links.</p>
             </div>
@@ -229,7 +234,7 @@ export default function Home() {
           <div className="categories-grid">
             {AI_CATS.map((c, i) => (
               <Link href={c.href} className="cat-card reveal" key={c.name} style={{ "--delay": `${(i % 4) * 50}ms` }}>
-                <div className="cat-icon" aria-hidden="true">{c.icon}</div>
+                <div className="cat-icon" aria-hidden="true"><c.icon width={22} height={22} /></div>
                 <div className="cat-info"><div className="cat-name">{c.name}</div><div className="cat-count">{c.count}</div></div>
               </Link>
             ))}
@@ -248,7 +253,7 @@ export default function Home() {
           <div className="categories-grid">
             {TECH_CATS.map((c, i) => (
               <Link href="/hub#tech" className="cat-card reveal" key={c.name} style={{ "--delay": `${(i % 4) * 50}ms` }}>
-                <div className="cat-icon" aria-hidden="true">{c.icon}</div>
+                <div className="cat-icon" aria-hidden="true"><c.icon width={22} height={22} /></div>
                 <div className="cat-info"><div className="cat-name">{c.name}</div><div className="cat-count">{c.count}</div></div>
               </Link>
             ))}
@@ -265,9 +270,9 @@ export default function Home() {
             <p className="section-sub reveal" style={{ "--delay": "120ms" }}>It&apos;s free and there&apos;s no account. Here&apos;s the whole flow.</p>
           </div>
           <div className="features-grid" data-spotlight>
-            <div className="feature-card reveal"><div className="feature-icon" aria-hidden="true">1️⃣</div><h3 className="feature-title">Choose your section</h3><p className="feature-desc">Switch between AI Tools and Tech Stack with a click, or press <kbd>1</kbd> / <kbd>2</kbd>.</p></div>
-            <div className="feature-card reveal" style={{ "--delay": "80ms" }}><div className="feature-icon" aria-hidden="true">2️⃣</div><h3 className="feature-title">Search or browse</h3><p className="feature-desc">Use fuzzy global search (<kbd>Ctrl</kbd>+<kbd>K</kbd>) or drill into any of the {totalCategories} sidebar categories.</p></div>
-            <div className="feature-card reveal" style={{ "--delay": "160ms" }}><div className="feature-icon" aria-hidden="true">3️⃣</div><h3 className="feature-title">Inspect &amp; compare</h3><p className="feature-desc">Open the detail drawer for full info, or select multiple tools to compare side-by-side.</p></div>
+            <div className="feature-card reveal"><div className="feature-icon step-icon" aria-hidden="true">1</div><h3 className="feature-title">Choose your section</h3><p className="feature-desc">Switch between AI Tools and Tech Stack with a click, or press <kbd>1</kbd> / <kbd>2</kbd>.</p></div>
+            <div className="feature-card reveal" style={{ "--delay": "80ms" }}><div className="feature-icon step-icon" aria-hidden="true">2</div><h3 className="feature-title">Search or browse</h3><p className="feature-desc">Use fuzzy global search (<kbd>Ctrl</kbd>+<kbd>K</kbd>) or drill into any of the {totalCategories} sidebar categories.</p></div>
+            <div className="feature-card reveal" style={{ "--delay": "160ms" }}><div className="feature-icon step-icon" aria-hidden="true">3</div><h3 className="feature-title">Inspect &amp; compare</h3><p className="feature-desc">Open the detail drawer for full info, or select multiple tools to compare side-by-side.</p></div>
           </div>
         </div>
       </section>
