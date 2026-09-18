@@ -855,7 +855,7 @@ window.initTools = async function() {
       els.tdBody.innerHTML = `
         <div class="td-actions">
           <a class="td-visit-btn" href="${escapeHtml(tool.url || '#')}" target="_blank" rel="noopener">Visit website ↗</a>
-          <button class="td-fav-btn ${isFav ? 'active' : ''}" id="tdFavBtn" type="button"
+          <button class="td-fav-btn ${isFav ? 'active' : ''}" id="tools-tdFavBtn" type="button"
             aria-label="${isFav ? 'Remove from saved' : 'Save tool'}"></button>
         </div>
 
