@@ -2,12 +2,12 @@
 // Controllers query these element IDs at runtime; do not rename IDs.
 export const HUB_MARKUP = `<header class="hub-header">
     <div class="hub-topline">
-      <a class="hub-brand" href="/" aria-label="Back to ToolForge home">
+      <a class="hub-brand" href="/" aria-label="Back to ToolAtlas home">
         <span class="hub-brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/></svg>
         </span>
         <div class="hub-brand-copy">
-          <span class="hub-brand-text">ToolForge</span>
+          <span class="hub-brand-text">ToolAtlas</span>
           <span class="hub-brand-subtext">AI tools + developer technologies</span>
         </div>
       </a>
@@ -136,7 +136,7 @@ export const HUB_MARKUP = `<header class="hub-header">
 <footer class="directory-footer" aria-label="AI tools directory footer">
   <div class="directory-footer-inner">
     <div class="directory-footer-brand">
-      <strong>ToolForge</strong>
+      <strong>ToolAtlas</strong>
       <span id="tools-footer-summary">2,386 AI tools across curated categories.</span>
     </div>
     <div class="directory-footer-actions">
@@ -189,7 +189,7 @@ export const HUB_MARKUP = `<header class="hub-header">
 <footer class="directory-footer" aria-label="Technology directory footer">
   <div class="directory-footer-inner">
     <div class="directory-footer-brand">
-      <strong>ToolForge</strong>
+      <strong>ToolAtlas</strong>
       <span id="tech-tech-footer-summary">1,861 technologies organized by developer-focused categories.</span>
     </div>
     <div class="directory-footer-actions">

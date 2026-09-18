@@ -154,7 +154,7 @@
 
     // Ask the active section to refresh its result-chip text
     window.dispatchEvent(new CustomEvent('hub-message', {detail: {type:'refreshChip'}}));
-    document.title = section === 'tech' ? 'Tech Stack - ToolForge' : 'AI Tools - ToolForge';
+    document.title = section === 'tech' ? 'Tech Stack - ToolAtlas' : 'AI Tools - ToolAtlas';
 
     if (push) {
       try { history.replaceState(null, '', '#' + section); } catch(e) {}

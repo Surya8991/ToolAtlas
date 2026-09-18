@@ -598,7 +598,7 @@ window.initTools = async function() {
   }
 
   function exportCsv(){
-    exportToolRows(getExportRows(renderedTools), 'toolforge-tools-current-view.csv');
+    exportToolRows(getExportRows(renderedTools), 'toolatlas-tools-current-view.csv');
   }
 
   function exportSaved(){
@@ -610,7 +610,7 @@ window.initTools = async function() {
       showToast('No saved tools to export');
       return;
     }
-    exportToolRows(getExportRows(savedTools), 'toolforge-saved-tools.csv');
+    exportToolRows(getExportRows(savedTools), 'toolatlas-saved-tools.csv');
   }
 
   function inferToolGuidance(tool, similar){

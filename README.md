@@ -1,10 +1,10 @@
-# ⚡ ToolForge
+# ⚡ ToolAtlas
 
 A premium developer catalog featuring **2,386 AI Tools** and **1,861 Developer Technologies**, built on **Next.js 15 (App Router) + React 19 + TypeScript**. A polished marketing site (Home / About / Contact) wraps the full-featured catalog hub.
 
 ## 📁 Repository Structure
 ```
-toolforge/
+toolatlas/
 ├── app/                            # Next.js App Router
 │   ├── layout.tsx                  # Root layout (Inter font, metadata)
 │   ├── globals.css                 # World-class dark design system
@@ -35,8 +35,8 @@ toolforge/
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/Surya8991/Master-Tools-Hub.git
-cd Master-Tools-Hub
+git clone https://github.com/Surya8991/ToolAtlas.git
+cd ToolAtlas
 npm install
 npm run dev      # http://localhost:3000
 ```

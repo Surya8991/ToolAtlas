@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const REPO = "https://github.com/Surya8991/Master-Tools-Hub";
+const REPO = "https://github.com/Surya8991/ToolAtlas";
 
 export default function SiteFooter() {
   return (
@@ -13,7 +13,7 @@ export default function SiteFooter() {
                 <path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z" />
               </svg>
             </span>
-            ToolForge
+            ToolAtlas
           </div>
           <p className="footer-tagline">
             The developer&apos;s catalog for AI tools and technology stacks. Curated, searchable, always free.
@@ -57,7 +57,7 @@ export default function SiteFooter() {
         </div>
       </div>
       <div className="footer-bottom">
-        <p className="footer-copyright">© 2026 ToolForge. Built for the developer community.</p>
+        <p className="footer-copyright">© 2026 ToolAtlas. Built for the developer community.</p>
         <div className="footer-bottom-links">
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>

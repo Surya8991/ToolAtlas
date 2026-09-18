@@ -8,23 +8,23 @@ const ITEMS: Item[] = [
   {
     q: "How do I suggest a tool or technology to add?",
     a: (
-      <>Best way is to <a href="https://github.com/Surya8991/Master-Tools-Hub/issues/new" target="_blank" rel="noopener noreferrer">open a GitHub issue</a> with the name, URL, category, and a line on what it does. I check suggestions by hand, usually within a week. The form above works too, just pick the &quot;Tool / Tech Suggestion&quot; subject.</>
+      <>Best way is to <a href="https://github.com/Surya8991/ToolAtlas/issues/new" target="_blank" rel="noopener noreferrer">open a GitHub issue</a> with the name, URL, category, and a line on what it does. I check suggestions by hand, usually within a week. The form above works too, just pick the &quot;Tool / Tech Suggestion&quot; subject.</>
     ),
   },
   {
     q: "I found outdated or incorrect information. What should I do?",
     a: (
-      <><a href="https://github.com/Surya8991/Master-Tools-Hub/issues/new" target="_blank" rel="noopener noreferrer">Open an issue</a> with the tool name and what&apos;s wrong (pricing, description, URL, category). Corrections are the fastest thing for me to fix, so don&apos;t hesitate.</>
+      <><a href="https://github.com/Surya8991/ToolAtlas/issues/new" target="_blank" rel="noopener noreferrer">Open an issue</a> with the tool name and what&apos;s wrong (pricing, description, URL, category). Corrections are the fastest thing for me to fix, so don&apos;t hesitate.</>
     ),
   },
   {
     q: "Is the data available via an API or for download?",
     a: (
-      <>The raw data files (<code>tools-data.js</code> and <code>tech-data.js</code>) are right there in the <a href="https://github.com/Surya8991/Master-Tools-Hub" target="_blank" rel="noopener noreferrer">GitHub repo</a>. There&apos;s no formal API, but it&apos;s plain JSON so it&apos;s easy to work with. Ask if you need something specific.</>
+      <>The raw data files (<code>tools-data.js</code> and <code>tech-data.js</code>) are right there in the <a href="https://github.com/Surya8991/ToolAtlas" target="_blank" rel="noopener noreferrer">GitHub repo</a>. There&apos;s no formal API, but it&apos;s plain JSON so it&apos;s easy to work with. Ask if you need something specific.</>
     ),
   },
   {
-    q: "Can I sponsor or advertise on ToolForge?",
+    q: "Can I sponsor or advertise on ToolAtlas?",
     a: (
       <>I&apos;m open to tasteful, developer-focused sponsorships that don&apos;t mess with the catalog. What I won&apos;t do is sell placement. Paying won&apos;t move a tool up the rankings or into a category. If that works for you, use the form with the &quot;Partnership / Collaboration&quot; subject.</>
     ),
@@ -36,9 +36,9 @@ const ITEMS: Item[] = [
     ),
   },
   {
-    q: "Is ToolForge open source?",
+    q: "Is ToolAtlas open source?",
     a: (
-      <>Yep, all the source is on <a href="https://github.com/Surya8991/Master-Tools-Hub" target="_blank" rel="noopener noreferrer">GitHub</a>. PRs are welcome for fixes, accessibility tweaks, and features. For anything bigger, open an issue first so we can talk it through before you put in the work.</>
+      <>Yep, all the source is on <a href="https://github.com/Surya8991/ToolAtlas" target="_blank" rel="noopener noreferrer">GitHub</a>. PRs are welcome for fixes, accessibility tweaks, and features. For anything bigger, open an issue first so we can talk it through before you put in the work.</>
     ),
   },
 ];

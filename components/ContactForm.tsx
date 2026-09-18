@@ -22,8 +22,8 @@ export default function ContactForm() {
 
     const body = [`Name: ${name}`, `Email: ${email}`, `Subject: ${subject}`, "", message].join("\n");
     const href =
-      "mailto:contact@toolforge.dev" +
-      "?subject=" + encodeURIComponent("[ToolForge] " + subject) +
+      "mailto:contact@toolatlas.dev" +
+      "?subject=" + encodeURIComponent("[ToolAtlas] " + subject) +
       "&body=" + encodeURIComponent(body);
     window.location.href = href;
     setTimeout(() => setSent(true), 400);

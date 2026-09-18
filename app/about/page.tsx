@@ -7,7 +7,7 @@ import Effects from "@/components/Effects";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "ToolForge is built by Surya L, a self-taught developer in Bangalore who builds web tools. Here is the story behind the catalog.",
+    "ToolAtlas is built by Surya L, a self-taught developer in Bangalore who builds web tools. Here is the story behind the catalog.",
 };
 
 const REPO = "https://github.com/Surya8991";
@@ -44,7 +44,7 @@ export default function About() {
             Hi, I&apos;m Surya.<br /><span className="grad">I build web tools.</span>
           </h1>
           <p className="page-hero-sub reveal" style={{ "--delay": "140ms" }}>
-            A self-taught developer from Bangalore. ToolForge is one of the things I&apos;ve built. Here is the story behind it.
+            A self-taught developer from Bangalore. ToolAtlas is one of the things I&apos;ve built. Here is the story behind it.
           </p>
         </div>
       </header>
@@ -56,7 +56,7 @@ export default function About() {
             <h2 className="section-title reveal" id="story-heading" style={{ "--delay": "60ms" }}>From one huge HTML file to this</h2>
           </div>
           <div className="about-story reveal" style={{ marginTop: "40px", "--delay": "120ms" }}>
-            <p>I&apos;m a self-taught developer based in Bangalore, and I spend most of my free time building small web tools that scratch my own itches. A free <a href={`${REPO}/ResumeBuildz`} target="_blank" rel="noopener noreferrer">resume builder</a>, an AI <a href={`${REPO}/CareerPath-AI`} target="_blank" rel="noopener noreferrer">career-path helper</a>, an <a href={`${REPO}/SEO-Suite`} target="_blank" rel="noopener noreferrer">SEO toolkit</a>, and a handful of others. ToolForge is one of those projects.</p>
+            <p>I&apos;m a self-taught developer based in Bangalore, and I spend most of my free time building small web tools that scratch my own itches. A free <a href={`${REPO}/ResumeBuildz`} target="_blank" rel="noopener noreferrer">resume builder</a>, an AI <a href={`${REPO}/CareerPath-AI`} target="_blank" rel="noopener noreferrer">career-path helper</a>, an <a href={`${REPO}/SEO-Suite`} target="_blank" rel="noopener noreferrer">SEO toolkit</a>, and a handful of others. ToolAtlas is one of those projects.</p>
             <p>It started because I wanted <strong>one place to keep track of AI tools and the tech I use</strong>, instead of digging through bookmarks, newsletters, and half-remembered Reddit threads. So I built a list. The first version was a single hand-coded HTML file with no build step, just data crammed into a 7.11&nbsp;MB document.</p>
             <p>It did the job, but it was slow to open, a pain to update, and impossible to share. So I rebuilt it properly, first with Vite and now on <strong>Next.js and React</strong>, splitting the data into chunks that load on demand and building the search index ahead of time.</p>
             <p>It now holds <strong>2,386 AI tools</strong> across writing, coding, image generation, video, SEO, and a few dozen other categories, plus <strong>1,861 developer technologies</strong> covering most of the stack. I add and check entries by hand. Nothing scraped, nothing paid for a spot.</p>

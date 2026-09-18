@@ -10,26 +10,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://toolforge.dev"),
+  metadataBase: new URL("https://toolatlas.dev"),
   title: {
-    default: "ToolForge: AI Tools & Developer Technologies",
-    template: "%s | ToolForge",
+    default: "ToolAtlas: AI Tools & Developer Technologies",
+    template: "%s | ToolAtlas",
   },
   description:
     "A hand-checked catalog of 2,386 AI tools and 1,861 developer technologies. Search, compare, and save. No signup, no spam.",
   icons: { icon: "/favicon.svg" },
   openGraph: {
     type: "website",
-    siteName: "ToolForge",
-    title: "ToolForge: AI Tools & Developer Technologies",
+    siteName: "ToolAtlas",
+    title: "ToolAtlas: AI Tools & Developer Technologies",
     description:
       "A hand-checked catalog of 2,386 AI tools and 1,861 developer technologies.",
-    url: "https://toolforge.dev/",
+    url: "https://toolatlas.dev/",
     images: ["/favicon.svg"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ToolForge: AI Tools & Developer Technologies",
+    title: "ToolAtlas: AI Tools & Developer Technologies",
     description:
       "A hand-checked catalog of 2,386 AI tools and 1,861 developer technologies.",
   },

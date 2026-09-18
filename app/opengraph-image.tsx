@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "ToolForge — AI Tools & Developer Technologies";
+export const alt = "ToolAtlas — AI Tools & Developer Technologies";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -37,7 +37,7 @@ export default function OpengraphImage() {
           >
             ⚡
           </div>
-          <div style={{ fontSize: "34px", fontWeight: 800, letterSpacing: "-0.02em" }}>ToolForge</div>
+          <div style={{ fontSize: "34px", fontWeight: 800, letterSpacing: "-0.02em" }}>ToolAtlas</div>
         </div>
         <div
           style={{

@@ -85,11 +85,11 @@ export default function Home() {
             <div className="browser">
               <div className="browser-bar">
                 <span className="dot red" /><span className="dot amber" /><span className="dot green" />
-                <div className="browser-url">toolforge.dev/hub</div>
+                <div className="browser-url">toolatlas.dev/hub</div>
               </div>
               <div className="app">
                 <div className="app-top">
-                  <div className="app-brand">⚡ ToolForge</div>
+                  <div className="app-brand">⚡ ToolAtlas</div>
                   <div className="app-tabs">
                     <span className="app-tab active">🤖 AI Tools</span>
                     <span className="app-tab">🛠 Tech Stack</span>
