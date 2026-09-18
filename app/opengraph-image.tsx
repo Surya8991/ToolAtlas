@@ -19,10 +19,10 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "90px",
-          backgroundColor: "#06060c",
+          backgroundColor: "#0b1120",
           backgroundImage:
-            "radial-gradient(900px 500px at 15% 0%, rgba(139,92,246,0.45), transparent 60%), radial-gradient(800px 500px at 100% 100%, rgba(34,211,238,0.32), transparent 60%)",
-          color: "#ffffff",
+            "radial-gradient(900px 500px at 15% 0%, rgba(201,161,90,0.35), transparent 60%), radial-gradient(800px 500px at 100% 100%, rgba(201,161,90,0.18), transparent 60%)",
+          color: "#f7f5f0",
           fontFamily: "sans-serif",
         }}
       >
@@ -36,7 +36,7 @@ export default function OpengraphImage() {
               alignItems: "center",
               justifyContent: "center",
               fontSize: "38px",
-              background: "linear-gradient(135deg,#a78bfa,#6366f1,#22d3ee)",
+              background: "linear-gradient(135deg,#8a6d3a,#c9a15a,#e2bc7c)",
             }}
           >
             ⚡
@@ -55,17 +55,11 @@ export default function OpengraphImage() {
           }}
         >
           <span style={{ marginRight: "18px" }}>Find the right tool,</span>
-          <span
-            style={{
-              background: "linear-gradient(120deg,#a78bfa,#6366f1,#3b82f6,#22d3ee)",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
-          >
+          <span style={{ color: "#e2bc7c" }}>
             skip the noise.
           </span>
         </div>
-        <div style={{ fontSize: "30px", color: "#b6b6cf", marginTop: "34px", maxWidth: "880px" }}>
+        <div style={{ fontSize: "30px", color: "#c9c3b4", marginTop: "34px", maxWidth: "880px" }}>
           A hand-checked catalog of {stats.totalTools.toLocaleString()} AI tools and {stats.totalTech.toLocaleString()} developer technologies.
         </div>
         <div style={{ display: "flex", gap: "14px", marginTop: "48px" }}>
@@ -76,11 +70,11 @@ export default function OpengraphImage() {
                 display: "flex",
                 fontSize: "24px",
                 fontWeight: 600,
-                color: "#e9e9f5",
+                color: "#f7f5f0",
                 padding: "12px 26px",
                 borderRadius: "999px",
-                border: "1px solid rgba(255,255,255,0.16)",
-                backgroundColor: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(201,161,90,0.28)",
+                backgroundColor: "rgba(247,245,240,0.04)",
               }}
             >
               {t}

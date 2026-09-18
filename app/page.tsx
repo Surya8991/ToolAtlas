@@ -62,6 +62,24 @@ export default function Home() {
         <div className="hero-orb o1" aria-hidden="true" />
         <div className="hero-orb o2" aria-hidden="true" />
         <div className="hero-orb o3" aria-hidden="true" />
+        <svg className="compass-rose" viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="100" cy="100" r="66" fill="none" stroke="currentColor" strokeWidth="1" />
+          <g stroke="currentColor" strokeWidth="1">
+            <line x1="100" y1="4" x2="100" y2="26" />
+            <line x1="100" y1="174" x2="100" y2="196" />
+            <line x1="4" y1="100" x2="26" y2="100" />
+            <line x1="174" y1="100" x2="196" y2="100" />
+            <line x1="30.7" y1="30.7" x2="45.5" y2="45.5" />
+            <line x1="154.5" y1="154.5" x2="169.3" y2="169.3" />
+            <line x1="169.3" y1="30.7" x2="154.5" y2="45.5" />
+            <line x1="45.5" y1="154.5" x2="30.7" y2="169.3" />
+          </g>
+          <path d="M100 22 L110 100 L100 178 L90 100 Z" fill="currentColor" opacity=".8" />
+          <path d="M22 100 L100 90 L178 100 L100 110 Z" fill="currentColor" opacity=".5" />
+          <circle cx="100" cy="100" r="4" fill="currentColor" />
+          <text x="100" y="16" textAnchor="middle" fontSize="9" fill="currentColor" fontFamily="var(--font)">N</text>
+        </svg>
         <div className="hero-inner">
           <div className="hero-badge reveal">
             <span className="hero-badge-dot" aria-hidden="true" />

@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Space_Grotesk, Fraunces } from "next/font/google";
 import "./globals.css";
 import { getCatalogStats } from "@/lib/catalogStats";
 
-const inter = Inter({
+const grotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-grotesk",
+  display: "swap",
+});
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
   display: "swap",
 });
 
@@ -36,7 +43,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = { themeColor: "#06060c" };
+export const viewport = { themeColor: "#0b1120" };
 
 export default function RootLayout({
   children,
@@ -44,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${grotesk.variable} ${fraunces.variable}`}>
       <body>{children}</body>
     </html>
   );
