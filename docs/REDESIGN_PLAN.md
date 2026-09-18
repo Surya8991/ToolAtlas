@@ -22,6 +22,60 @@ undone by `82aadd7`). We keep the current architecture exactly:
 
 We improve look/feel/UX/behaviour by editing the existing files, not replacing them.
 
+## Completed work (before this plan)
+
+Everything below is already committed on `add-video-models` (oldest → newest). Listed
+here so this document is the full picture, not just what's left to do.
+
+**Catalog data (content/data, not UI):**
+- `2326e58`, `77b86db`, `7a2e178` — closed out the design-review's P0/P1/P2 findings:
+  every published tool/tech/category count was wrong in 25+ places, fixed by a single
+  source of truth (`lib/catalogStats.ts`); category-selection now writes to the URL hash
+  (deep links became real, not just claimed); a conflicting duplicate `:root` token block
+  in `hub.css` removed; first-ever `:focus-visible` rule added to the marketing site;
+  low-contrast focus rings fixed; duplicate Sort/preset filters (Free/Open Source/etc.)
+  removed from Sort; Compare modal + global search got correct ARIA roles and focus
+  management; mobile touch targets raised to 44×44.
+- `7a2e178` — sidebar became a real collapsible department tree (added `parentId` to
+  every category in `tools-data.js`); Master List's 2,324-card first paint cut to 60
+  cards / 1,803 DOM nodes via "Show N more" pagination (was 43,621 nodes).
+- `e31837f`, `3a8874b`, `f45075b`, `9a59715` — planned and executed the full taxonomy
+  reorg: 9 department umbrella tabs added; the 315-item "Cybersecurity & Privacy"
+  mega-category split into 7 real subcategories; "Useful Websites & Utilities" (84 items)
+  split into 8; "AI Browser Extensions" (118 items) dissolved into real functional
+  categories with a new `delivery_format` facet; two follow-up passes fixed stale
+  category text (description/best_for/tags) and a stale `placement.group` left behind
+  on the 517 reclassified tools.
+- `8bb9e08` — rebrand "ToolForge" → "ToolAtlas" completed everywhere, including the
+  GitHub repo slug itself (`Master-Tools-Hub` → `ToolAtlas`), fixing an earlier partial
+  rebrand that renamed the product but not the repo.
+- `c58b5a9`, `1bc381b`, `bf6c4ba`, `68065b5` — catalog freshness pass: added 5 tools
+  launched after the last bulk-verify, refreshed 2 stale entries (Gemini, Meta AI);
+  refreshed live GitHub star counts/status for 695 tech entries; deduped 73 duplicate
+  tool rows + 11 duplicate tech rows; added 6 new 2026 video-generation models and
+  refreshed 4 stale flagship versions (Veo, Sora, Kling, Runway).
+
+**Visual design ("Field Atlas"):**
+- `24de6dd` — full redesign from the old generic violet-to-cyan AI-SaaS palette to
+  "Field Atlas": ink/brass/paper cartography theme, Space Grotesk + Fraunces fonts,
+  authored compass-rose hero SVG, gradient-clipped heading text removed (banned pattern),
+  one-accent (brass) strategy across both the dark marketing "cover" and the light hub
+  "pages" register. Found and fixed a live bug in the same pass: `.tab-children` was
+  visually showing regardless of the `hidden` attribute because an author CSS rule beats
+  the browser's own `[hidden]{display:none}` at equal specificity.
+- `ce59feb` — sidebar departments converted from inline-expanding blocks to floating
+  dropdowns (one open at a time); found and fixed a real bug where clicking a department
+  closed its own dropdown one tick later, because re-rendering mid-click-bubble detached
+  the original event target (fixed via `e.composedPath()` instead of `.contains(e.target)`).
+- `b677334` — borrowed the monospace/tabular-nums treatment from a user-shared reference
+  design for data readouts (star counts, category counts); closed out a second color-sweep
+  pass that found several live leftover violet/cyan values the first pass missed.
+
+**Reverted (do not repeat):**
+- `627be9c` → reverted by `82aadd7` — a full React re-architecture of `/hub` was started
+  under a misreading of "rebuild," then fully reverted once corrected. See the top of
+  this document.
+
 ## Decisions locked with the user
 
 1. **Both** Hub and marketing pages are in scope.
