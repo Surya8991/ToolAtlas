@@ -802,6 +802,55 @@
     });
   }
 
+  // Sidebar-as-drawer (mobile only -- CSS keeps the toggle/backdrop
+  // display:none above the 980px breakpoint, where the sidebar stays sticky
+  // inline exactly as before). Each section gets its own toggle/panel/
+  // backdrop/close quartet; only one is ever visible since tools-section and
+  // tech-section are mutually exclusive.
+  ['tools', 'tech'].forEach(function(prefix){
+    const toggle = document.getElementById(prefix + '-sidebarToggle');
+    const panel = document.getElementById(prefix + '-sidebarPanel');
+    const backdrop = document.getElementById(prefix + '-sidebarBackdrop');
+    const closeBtn = document.getElementById(prefix + '-sidebarClose');
+    if (!toggle || !panel) return;
+
+    function openDrawer(){
+      panel.classList.add('open');
+      if (backdrop) backdrop.removeAttribute('hidden');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('sidebar-drawer-open');
+    }
+    function closeDrawer(){
+      panel.classList.remove('open');
+      if (backdrop) backdrop.setAttribute('hidden', '');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('sidebar-drawer-open');
+    }
+
+    toggle.addEventListener('click', () => {
+      panel.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && panel.classList.contains('open')) closeDrawer();
+    });
+
+    // Picking an actual category should return the user to the results
+    // instead of leaving the drawer sitting open over them -- but picking a
+    // department row (.tab-btn-dept) only opens its own dropdown of
+    // children, it isn't a finished choice yet, so that case is excluded.
+    // tools.js/tech.js's own category-click handlers are delegated on the
+    // stable #<prefix>-tabs container and already fire (and re-render it)
+    // before this listener sees the bubbling click, but closest() still
+    // resolves correctly on a detached target -- same reasoning as the
+    // composedPath() fix for the dropdown's outside-click handler.
+    panel.addEventListener('click', e => {
+      const btn = e.target.closest('.tab-btn');
+      if (btn && !btn.classList.contains('tab-btn-dept')) closeDrawer();
+    });
+  });
+
   let saved = '';
   try { saved = localStorage.getItem('hubSection') || ''; } catch(e) {}
   if (!applyHash(location.hash, false)) {

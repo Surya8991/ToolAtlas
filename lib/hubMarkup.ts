@@ -77,7 +77,10 @@ export function buildHubMarkup(stats: CatalogStats): string {
 
 <div id="tools-recentStrip" class="recent-strip hidden" aria-label="Recently viewed tools"></div>
 <div class="page-shell">
-  <aside class="category-sidebar" aria-label="Categories and filters">
+  <aside class="category-sidebar" id="tools-sidebarPanel" aria-label="Categories and filters">
+    <button type="button" class="sidebar-close" id="tools-sidebarClose" aria-label="Close categories">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
     <div class="sidebar-title">Categories</div>
     <div class="category-tools" aria-label="Category tools">
       <label class="field" for="tools-categorySearch">
@@ -90,8 +93,8 @@ export function buildHubMarkup(stats: CatalogStats): string {
       <div class="utility-actions">
         <button class="action-btn" id="tools-resetFilters" type="button">All categories</button>
         <button class="action-btn" id="tools-clearSaved" type="button">Clear saved</button>
-        <button class="action-btn" id="tools-exportSaved" type="button">⬇ Export saved</button>
-        <button class="action-btn" id="tools-exportCsv" type="button">⬇ Export CSV</button>
+        <button class="action-btn action-btn-export" id="tools-exportSaved" type="button">⬇ Export saved</button>
+        <button class="action-btn action-btn-export" id="tools-exportCsv" type="button">⬇ Export CSV</button>
       </div>
       <div class="field">
         <span class="field-label">Density</span>
@@ -104,8 +107,13 @@ export function buildHubMarkup(stats: CatalogStats): string {
     </div>
     <nav class="tabs" id="tools-tabs" aria-label="Tool categories" role="tablist"></nav>
   </aside>
+  <div class="sidebar-backdrop" id="tools-sidebarBackdrop" hidden></div>
 
   <section data-embedded-main="tools" id="tools-main">
+    <button type="button" class="sidebar-toggle" id="tools-sidebarToggle" aria-expanded="false" aria-controls="tools-sidebarPanel">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+      <span>Categories &amp; filters</span>
+    </button>
     <div id="tools-content"></div>
   </section>
 </div>
@@ -163,7 +171,10 @@ export function buildHubMarkup(stats: CatalogStats): string {
     <section id="tech-section" class="hub-section sec-tech" role="tabpanel" aria-labelledby="hub-tab-tech" hidden>
 <a class="skip-link" href="#tech-main">Skip to tech stack</a>
 <div class="page-shell">
-  <aside class="category-sidebar" aria-label="Categories">
+  <aside class="category-sidebar" id="tech-sidebarPanel" aria-label="Categories">
+    <button type="button" class="sidebar-close" id="tech-sidebarClose" aria-label="Close categories">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
     <div class="sidebar-title">Categories</div>
     <div class="category-tools" aria-label="Category tools">
       <label class="field" for="tech-categorySearch">
@@ -174,8 +185,13 @@ export function buildHubMarkup(stats: CatalogStats): string {
     </div>
     <nav class="tabs" id="tech-tabs" aria-label="Technology categories"></nav>
   </aside>
+  <div class="sidebar-backdrop" id="tech-sidebarBackdrop" hidden></div>
 
   <section data-embedded-main="tech" id="tech-main">
+    <button type="button" class="sidebar-toggle" id="tech-sidebarToggle" aria-expanded="false" aria-controls="tech-sidebarPanel">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+      <span>Categories &amp; filters</span>
+    </button>
     <div id="tech-content"></div>
   </section>
 </div>

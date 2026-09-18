@@ -1358,4 +1358,81 @@ body.hub-dark .directory-footer-inner {
 }
 body.hub-dark .directory-footer-brand strong { color: #f0f0f8; }
 body.hub-dark .directory-footer-brand span { color: #8a8aa3; }
+
+/* ── Sidebar as a mobile drawer (redesign H1) ───────────────────────
+   Below 980px the category sidebar used to render inline, ABOVE the
+   results: category search, 4 utility buttons, density controls, and
+   all 9 department rows, all before a single tool/tech card. Now it's
+   an off-canvas drawer opened by a "Categories & filters" button that
+   sits where the sidebar used to start, so results are the first thing
+   on screen. Desktop (>=981px) is untouched -- toggle/close/backdrop
+   stay display:none there and the sidebar remains sticky inline. */
+.sidebar-toggle{ display:none; }
+.sidebar-close{ display:none; }
+.sidebar-backdrop{ display:none; }
+
+@media(max-width:980px){
+  .sidebar-toggle{
+    display:flex; align-items:center; gap:8px;
+    width:100%; min-height:44px; margin-bottom:12px;
+    padding:10px 14px; border-radius:14px;
+    background:#fff; border:1px solid var(--border-strong);
+    color:var(--heading); font-size:13.5px; font-weight:800;
+    box-shadow:0 2px 8px rgba(15,23,42,.05);
+  }
+  .sidebar-toggle:hover{ background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent-hover); }
+  .sidebar-toggle svg{ flex:0 0 auto; color:var(--accent); }
+
+  /* The sidebar itself becomes a fixed off-canvas panel instead of the
+     relative/inline block the >980px mobile rule further up this file
+     still sets it to -- this rule is later in the file at equal
+     specificity (.category-sidebar, one class) so it wins. */
+  .category-sidebar{
+    position:fixed; top:0; left:0; bottom:0; z-index:10060;
+    width:min(340px,86vw); max-height:none; margin-bottom:0;
+    border-radius:0; box-shadow:12px 0 40px rgba(15,23,42,.22);
+    transform:translateX(-100%);
+    transition:transform .24s cubic-bezier(.2,.8,.3,1);
+    overflow-y:auto;
+  }
+  .category-sidebar.open{ transform:translateX(0); }
+
+  .sidebar-close{
+    display:flex; align-items:center; justify-content:center;
+    position:absolute; top:8px; right:8px; z-index:1;
+    width:44px; height:44px;
+    border-radius:11px; background:var(--surface-2); border:1px solid var(--border-strong);
+    color:var(--muted);
+  }
+  .sidebar-close:hover{ background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent-hover); }
+
+  /* :not([hidden]) rather than a bare display:block -- an author rule at
+     equal specificity to the UA [hidden]{display:none} rule still wins
+     over it (the same trap .tab-children hit earlier in this project), so
+     the backdrop must stay keyed off the real hidden attribute JS toggles,
+     not a separate class. */
+  .sidebar-backdrop:not([hidden]){
+    display:block; position:fixed; inset:0; z-index:10050;
+    background:rgba(15,23,42,.45);
+  }
+}
+
+/* Lock page scroll behind the open drawer + backdrop. */
+body.sidebar-drawer-open{ overflow:hidden; }
+
+/* ── Sidebar utility actions: desktop tidy ──────────────────────────
+   The 4 buttons (All categories / Clear saved / Export saved / Export
+   CSV) used to just flex-wrap, reading as one undifferentiated pile.
+   A 2-column grid pairs them by purpose, and the export pair gets a
+   hairline to read as a distinct group -- desktop/tablet only; the
+   >=981px guard leaves the existing dedicated mobile grid rules (which
+   this sidebar now reaches from inside the drawer) untouched. */
+@media(min-width:981px){
+  .sidebar-controls .utility-actions{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  }
+}
+.action-btn-export{
+  margin-top:4px; padding-top:11px; border-top:1px dashed var(--border);
+}
 body.hub-dark .footer-meta { color: #8a8aa3; }
