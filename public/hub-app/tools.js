@@ -86,6 +86,10 @@ window.initTools = async function() {
   let presetQuery = '';
   let sortMode = 'recommended';
   let advancedOpen = false;
+  // Collapsed by default so the "Recommended views" panel doesn't push real
+  // results down on every visit -- opens automatically once a preset is
+  // actually chosen (applyToolPreset), and freely toggleable after that.
+  let recommendedOpen = false;
   let advFilters = {pricing:'all', platform:'all', user:'all', availability:'all', status:'all'};
   let renderedTools = [];
   let visibleCount = CARD_PAGE_SIZE;
@@ -198,9 +202,17 @@ window.initTools = async function() {
   ];
 
   function renderRecommendedViews(){
-    return `<div class="recommended-panel" aria-label="Recommended views">
-      <div class="recommended-head"><span class="filter-kicker">Start here</span><strong>Recommended views</strong><span>Pick a ready-made lens instead of browsing ${tools.length.toLocaleString()} cards.</span></div>
-      <div class="preset-grid">${TOOL_PRESETS.map(p=>`<button type="button" class="preset-chip ${activePreset===p.key?'active':''}" data-preset="${escapeHtml(p.key)}">${escapeHtml(p.label)}</button>`).join('')}</div>
+    const activeChoice = TOOL_PRESETS.find(p => p.key === activePreset);
+    return `<div class="recommended-panel ${recommendedOpen ? 'open' : ''}" aria-label="Recommended views">
+      <button type="button" class="recommended-toggle" id="tools-recommendedToggle" aria-expanded="${recommendedOpen ? 'true' : 'false'}" aria-controls="tools-recommendedBody">
+        <span class="filter-kicker">Start here</span>
+        <strong>Recommended views</strong>
+        ${activeChoice ? `<span class="recommended-active-pill">${escapeHtml(activeChoice.label)}</span>` : `<span class="recommended-hint">Ready-made lenses instead of browsing ${tools.length.toLocaleString()} cards</span>`}
+        <svg class="recommended-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="recommended-body" id="tools-recommendedBody" ${recommendedOpen ? '' : 'hidden'}>
+        <div class="preset-grid">${TOOL_PRESETS.map(p=>`<button type="button" class="preset-chip ${activePreset===p.key?'active':''}" data-preset="${escapeHtml(p.key)}">${escapeHtml(p.label)}</button>`).join('')}</div>
+      </div>
     </div>`;
   }
 
@@ -217,6 +229,7 @@ window.initTools = async function() {
     advFilters = {pricing:'all', platform:'all', user:'all', availability:'all', status:'all'};
     if(sortMode === 'free') advFilters.availability = 'free';
     if(sortMode === 'open_source') advFilters.availability = 'open_source';
+    recommendedOpen = true;
     renderTabs();
     renderContent();
     scrollSectionTop();
@@ -344,6 +357,7 @@ window.initTools = async function() {
     categoryQuery = '';
     sortMode = 'recommended';
     advancedOpen = false;
+    recommendedOpen = false;
     advFilters = {pricing:'all', platform:'all', user:'all', availability:'all', status:'all'};
     if(els.categorySearch) els.categorySearch.value = '';
     renderTabs();
@@ -1000,6 +1014,12 @@ window.initTools = async function() {
 
   // Delegated card action handlers (replaces per-card binding)
   els.content.addEventListener('click', e => {
+    const recToggle = e.target.closest('.recommended-toggle');
+    if(recToggle){
+      recommendedOpen = !recommendedOpen;
+      renderContent();
+      return;
+    }
     const presetBtn = e.target.closest('.preset-chip');
     if(presetBtn){
       applyToolPreset(presetBtn.dataset.preset);

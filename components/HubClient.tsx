@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 // Version query busts the browser cache when the hub stylesheet changes.
-const CSS_HREF = "/hub-app/hub.css?v=11";
+const CSS_HREF = "/hub-app/hub.css?v=12";
 const SCRIPTS = [
   "/hub-app/dataLoader.js",
   "/hub-app/tools.js",
