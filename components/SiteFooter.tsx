@@ -48,11 +48,11 @@ export default function SiteFooter() {
         <div>
           <div className="footer-col-title">Tech Stack</div>
           <ul className="footer-links">
-            <li><Link href="/hub#tech">Frontend</Link></li>
-            <li><Link href="/hub#tech">Backend</Link></li>
-            <li><Link href="/hub#tech">Databases</Link></li>
-            <li><Link href="/hub#tech">DevOps</Link></li>
-            <li><Link href="/hub#tech">Mobile</Link></li>
+            <li><Link href="/hub#tech/frontend_ui">Frontend</Link></li>
+            <li><Link href="/hub#tech/backend_servers">Backend</Link></li>
+            <li><Link href="/hub#tech/databases_storage_search">Databases</Link></li>
+            <li><Link href="/hub#tech/devops_infra">DevOps</Link></li>
+            <li><Link href="/hub#tech/mobile_desktop">Mobile</Link></li>
           </ul>
         </div>
       </div>

@@ -1,10 +1,14 @@
 import { ImageResponse } from "next/og";
+import { getCatalogStats } from "@/lib/catalogStats";
 
 export const alt = "ToolAtlas — AI Tools & Developer Technologies";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default function OpengraphImage() {
+  const stats = getCatalogStats();
+  const toolsLabel = `${stats.totalTools.toLocaleString()} AI Tools`;
+  const techLabel = `${stats.totalTech.toLocaleString()} Technologies`;
   return new ImageResponse(
     (
       <div
@@ -62,10 +66,10 @@ export default function OpengraphImage() {
           </span>
         </div>
         <div style={{ fontSize: "30px", color: "#b6b6cf", marginTop: "34px", maxWidth: "880px" }}>
-          A hand-checked catalog of 2,386 AI tools and 1,861 developer technologies.
+          A hand-checked catalog of {stats.totalTools.toLocaleString()} AI tools and {stats.totalTech.toLocaleString()} developer technologies.
         </div>
         <div style={{ display: "flex", gap: "14px", marginTop: "48px" }}>
-          {["2,386 AI Tools", "1,861 Technologies", "Always Free"].map((t) => (
+          {[toolsLabel, techLabel, "Always Free"].map((t) => (
             <div
               key={t}
               style={{

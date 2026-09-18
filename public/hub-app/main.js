@@ -107,7 +107,12 @@
     const toolsN = window.__TOOLS_DATA__ && Array.isArray(window.__TOOLS_DATA__.tools) ? window.__TOOLS_DATA__.tools.length : 0;
     const techN = Array.isArray(window.__TECH_DATA__) ? window.__TECH_DATA__.length : 0;
     const total = toolsN + techN;
-    if (total > 0) hubTotalMeta.textContent = total.toLocaleString() + ' items · Updated May 2026';
+    // Only overwrite once BOTH datasets are counted -- otherwise this briefly
+    // shows a partial total (e.g. tools-only) as if it were the grand total.
+    if (toolsN > 0 && techN > 0) {
+      const updated = hubTotalMeta.dataset.updated || '';
+      hubTotalMeta.textContent = total.toLocaleString() + ' items' + (updated ? ' · Updated ' + updated : '');
+    }
   }
 
   async function activate(section, push) {
@@ -154,7 +159,7 @@
 
     // Ask the active section to refresh its result-chip text
     window.dispatchEvent(new CustomEvent('hub-message', {detail: {type:'refreshChip'}}));
-    document.title = section === 'tech' ? 'Tech Stack - ToolAtlas' : 'AI Tools - ToolAtlas';
+    document.title = section === 'tech' ? 'Tech Stack | ToolAtlas' : 'AI Tools | ToolAtlas';
 
     if (push) {
       try { history.replaceState(null, '', '#' + section); } catch(e) {}
@@ -292,11 +297,17 @@
   // Preload tools + tech data so global search can show proper icons and
   // sub-lines even before the user opens either section.
   function preloadDataForSearch() {
-    if (!window.__TOOLS_DATA__) {
-      DataLoader.loadData('data/tools-data.js', '__TOOLS_DATA__').catch(() => {});
-    }
-    if (!window.__TECH_DATA__) {
-      DataLoader.loadData('data/tech-data.js', '__TECH_DATA__').catch(() => {});
+    const tasks = [];
+    if (!window.__TOOLS_DATA__) tasks.push(DataLoader.loadData('data/tools-data.js', '__TOOLS_DATA__').catch(() => {}));
+    if (!window.__TECH_DATA__) tasks.push(DataLoader.loadData('data/tech-data.js', '__TECH_DATA__').catch(() => {}));
+    // Once whichever dataset the active tab didn't already load resolves, refresh
+    // both nav counts and the combined total -- otherwise the header keeps showing
+    // only the first-loaded dataset's count even after the second one arrives.
+    if (tasks.length) {
+      Promise.all(tasks).then(() => {
+        updateCount('tools');
+        updateCount('tech');
+      });
     }
   }
   if ('requestIdleCallback' in window) {

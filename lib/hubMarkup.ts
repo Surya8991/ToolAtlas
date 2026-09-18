@@ -1,6 +1,15 @@
 // AUTO-GENERATED from hub.html: the proven hub markup, injected by app/hub/page.tsx.
 // Controllers query these element IDs at runtime; do not rename IDs.
-export const HUB_MARKUP = `<header class="hub-header">
+//
+// This is a FUNCTION, not a static string: every count shown here comes from
+// the real catalog data (see lib/catalogStats.ts) so the server-rendered
+// first paint already matches what the client runtime computes a moment
+// later. Never hardcode a total/count literal in this file again.
+import type { CatalogStats } from "./catalogStats";
+
+export function buildHubMarkup(stats: CatalogStats): string {
+  const totalItems = stats.totalTools + stats.totalTech;
+  return `<header class="hub-header">
     <div class="hub-topline">
       <a class="hub-brand" href="/" aria-label="Back to ToolAtlas home">
         <span class="hub-brand-mark" aria-hidden="true">
@@ -16,12 +25,12 @@ export const HUB_MARKUP = `<header class="hub-header">
         <button class="hub-nav-btn active" data-target="tools" type="button" role="tab" id="hub-tab-tools" aria-selected="true" aria-controls="tools-section" tabindex="0">
           <span class="hub-nav-icon" aria-hidden="true">🤖</span>
           <span class="hub-nav-label">AI Tools</span>
-          <span class="hub-nav-count" id="hub-count-tools" aria-label="2386 AI tools">2,386</span>
+          <span class="hub-nav-count" id="hub-count-tools">${stats.totalTools.toLocaleString()}</span>
         </button>
         <button class="hub-nav-btn" data-target="tech" type="button" role="tab" id="hub-tab-tech" aria-selected="false" aria-controls="tech-section" tabindex="-1">
           <span class="hub-nav-icon" aria-hidden="true">🛠</span>
           <span class="hub-nav-label">Tech Stack</span>
-          <span class="hub-nav-count" id="hub-count-tech" aria-label="1861 tech items">1,861</span>
+          <span class="hub-nav-count" id="hub-count-tech">${stats.totalTech.toLocaleString()}</span>
         </button>
       </nav>
 
@@ -33,7 +42,7 @@ export const HUB_MARKUP = `<header class="hub-header">
 
       <div class="hub-meta">
         <a href="/" class="hub-home-link" aria-label="Home">← Home</a>
-        <span class="hub-total-meta" id="hub-total-meta">4,247 items · Updated May 2026</span>
+        <span class="hub-total-meta" id="hub-total-meta" data-updated="${stats.lastUpdatedLabel}">${totalItems.toLocaleString()} items · Updated ${stats.lastUpdatedLabel}</span>
         <span class="hub-result-chip" id="hub-result-chip" hidden></span>
         <button type="button" class="hub-help" id="hub-help-btn" aria-label="Keyboard shortcuts" aria-expanded="false" aria-controls="hub-help-popover">
           <kbd>?</kbd>
@@ -121,7 +130,7 @@ export const HUB_MARKUP = `<header class="hub-header">
   <div class="tool-detail-panel">
     <div class="td-head">
       <div class="td-identity">
-        <img class="td-favicon-lg" id="tools-tdFavicon" width="44" height="44" src="" alt="">
+        <img class="td-favicon-lg" id="tools-tdFavicon" width="44" height="44" alt="">
         <div class="td-name-block">
           <h2 class="td-title" id="tools-tdName"></h2>
           <a class="td-url-link" id="tools-tdUrlLink" href="#" target="_blank" rel="noopener"></a>
@@ -137,13 +146,13 @@ export const HUB_MARKUP = `<header class="hub-header">
   <div class="directory-footer-inner">
     <div class="directory-footer-brand">
       <strong>ToolAtlas</strong>
-      <span id="tools-footer-summary">2,386 AI tools across curated categories.</span>
+      <span id="tools-footer-summary">${stats.totalTools.toLocaleString()} AI tools across curated categories.</span>
     </div>
     <div class="directory-footer-actions">
       <button type="button" class="footer-action" data-footer-action="search">Search all</button>
       <button type="button" class="footer-action" data-footer-action="top">Back to top</button>
       <a href="/" class="footer-action" style="text-decoration:none">← Home</a>
-      <span class="footer-meta">Updated May 2026</span>
+      <span class="footer-meta">Updated ${stats.lastUpdatedLabel}</span>
     </div>
   </div>
 </footer>
@@ -190,16 +199,17 @@ export const HUB_MARKUP = `<header class="hub-header">
   <div class="directory-footer-inner">
     <div class="directory-footer-brand">
       <strong>ToolAtlas</strong>
-      <span id="tech-tech-footer-summary">1,861 technologies organized by developer-focused categories.</span>
+      <span id="tech-footer-summary">${stats.totalTech.toLocaleString()} technologies organized by developer-focused categories.</span>
     </div>
     <div class="directory-footer-actions">
       <button type="button" class="footer-action" data-footer-action="search">Search all</button>
       <button type="button" class="footer-action" data-footer-action="top">Back to top</button>
       <a href="/" class="footer-action" style="text-decoration:none">← Home</a>
-      <span class="footer-meta">Updated May 2026</span>
+      <span class="footer-meta">Updated ${stats.lastUpdatedLabel}</span>
     </div>
   </div>
 </footer>
 <button class="back-to-top" id="tech-backToTop" aria-label="Back to top">↑</button>
     </section>
   </main>`;
+}
