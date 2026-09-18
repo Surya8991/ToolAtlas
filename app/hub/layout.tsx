@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCatalogStats } from "@/lib/catalogStats";
+import "./hub.css";
 
 const stats = getCatalogStats();
 
