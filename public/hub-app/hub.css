@@ -594,6 +594,22 @@ h1{margin:0;font-size:clamp(25px,2.4vw,34px);line-height:1.05;font-weight:900;le
 .tab-count{background:#eef4ff;color:var(--accent-hover);padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:900;font-variant-numeric:tabular-nums}
 .tab-btn.active .tab-count{background:rgba(255,255,255,.20);color:rgba(255,255,255,.95)}
 
+/* Department tree: a department row (bold, full-width) plus a disclosure
+   toggle, with its subcategories indented and visually subordinate when
+   expanded. Fixes the sidebar rendering every category at one flat, equal
+   weight regardless of whether it's a department or a leaf. */
+.tab-group{display:grid;gap:4px}
+.tab-group-master{padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid #e2e8f0}
+.tab-row{display:flex;align-items:stretch;gap:4px}
+.tab-row .tab-btn-dept{flex:1;font-size:13px}
+.tab-disclosure{flex:0 0 auto;width:30px;border-radius:9px;background:#fff;border:1px solid var(--border-strong);color:#64748b;display:flex;align-items:center;justify-content:center;transition:.16s ease}
+.tab-disclosure:hover{background:#eef2ff;border-color:#c7d2fe;color:#4338ca}
+.tab-disclosure svg{transition:transform .16s ease}
+.tab-disclosure.expanded svg{transform:rotate(90deg)}
+.tab-children{display:grid;gap:3px;padding-left:16px;border-left:2px solid #eef2f7;margin-left:14px}
+.tab-btn-child{min-height:33px;padding:6px 10px 6px 12px;font-size:11.5px;font-weight:700;color:#475569}
+.tab-btn-child.active{box-shadow:0 4px 12px rgba(79,70,229,.18),inset 0 1px 0 rgba(255,255,255,.18)}
+
 main{min-width:0}
 .category-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
 .category-title{margin:0;color:var(--heading);font-size:24px;letter-spacing:-.035em}
@@ -603,6 +619,10 @@ main{min-width:0}
 .group-heading{display:flex;align-items:center;gap:10px;margin:16px 0 10px;color:#334155;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
 .group-heading::before{content:"";width:9px;height:9px;border-radius:999px;background:linear-gradient(135deg,#2563eb,#0891b2)}
 .group-count{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:900;letter-spacing:0;text-transform:none}
+.load-more-row{display:flex;justify-content:center;margin:28px 0 8px}
+.load-more-btn{min-height:44px;padding:11px 26px;border-radius:12px;background:linear-gradient(135deg,#4f46e5,#2563eb);border:1px solid #4f46e5;color:#fff;font-weight:800;font-size:13.5px;box-shadow:0 6px 16px rgba(79,70,229,.22);transition:.16s ease;cursor:pointer}
+.load-more-btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(79,70,229,.28)}
+.load-more-remaining{font-weight:600;opacity:.82;margin-left:6px}
 .tool-card{position:relative;min-width:0;min-height:220px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 5px 16px rgba(15,23,42,.045);transition:.22s ease;overflow:hidden}
 .tool-card:hover{transform:translateY(-3px);border-color:#93c5fd;box-shadow:0 12px 28px rgba(15,23,42,.10)}
 .tool-card::after{content:"";position:absolute;left:0;top:0;height:100%;width:3px;background:linear-gradient(180deg,#2563eb,#0891b2);opacity:0;transition:.22s ease}
@@ -806,6 +826,17 @@ kbd{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:8px;
   .tab-btn{flex:0 0 auto;width:auto;white-space:nowrap;min-height:40px;border-left:none;padding:8px 12px}
   .tab-btn:hover{border-left-color:transparent}
   .tab-btn.active{border-left-color:transparent}
+  /* The department tree can't work as a horizontal chip scroller like the
+     old flat category list did -- restore vertical stacking for it
+     specifically (an id beats the .tabs/.tab-btn rules above regardless of
+     source order). The Tech sidebar has no tree yet, so its flat list keeps
+     the horizontal scroller untouched. */
+  #tools-tabs{display:flex;flex-direction:column;overflow-x:visible;overflow-y:visible;gap:5px}
+  #tools-tabs .tab-group{display:grid;gap:4px}
+  #tools-tabs .tab-row{display:flex;gap:4px}
+  #tools-tabs .tab-btn{flex:1 1 auto;width:100%;white-space:normal;border-left:3px solid transparent;min-height:44px}
+  #tools-tabs .tab-disclosure{flex:0 0 34px;width:34px;min-height:44px}
+  #tools-tabs .tab-children{display:grid;gap:3px}
   .category-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
   .category-title{font-size:20px}
   .category-subtitle{font-size:12.5px;margin-top:2px}

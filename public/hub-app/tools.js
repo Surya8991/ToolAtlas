@@ -88,6 +88,8 @@ window.initTools = async function() {
   let advancedOpen = false;
   let advFilters = {pricing:'all', platform:'all', user:'all', availability:'all', status:'all'};
   let renderedTools = [];
+  let visibleCount = CARD_PAGE_SIZE;
+  let lastRenderKey = '';
   let searchQuery = '';
   let selectedCompare = new Set();
   let lastToolFocus = null;
@@ -352,27 +354,92 @@ window.initTools = async function() {
     scrollSectionTop();
   }
 
+  // Departments start collapsed -- 9 department rows (+ Master List) read as
+  // one screenful instead of the 56 flat, undifferentiated categories this
+  // sidebar used to render. Persisted across re-renders in this closure so
+  // toggling one department doesn't reset every other one.
+  const expandedDepts = new Set();
+
+  function ensureActiveDeptExpanded(){
+    const active = categories.find(c => c.id === activeTab);
+    if(active && active.parentId) expandedDepts.add(active.parentId);
+  }
+
   function renderTabs(){
+    ensureActiveDeptExpanded();
     const q = normalize(categoryQuery);
-    const visibleCategories = categories.filter(cat => {
+    const matches = cat => {
       if(!q) return true;
       const label = normalize(cat.label || '');
       return label.includes(q) || String(cat.count || '').includes(q);
+    };
+
+    const master = categories.find(c => c.id === 'tab-0');
+    const departments = categories.filter(c => c.parentId === null && c.id !== 'tab-0');
+    const childrenOf = deptId => categories.filter(c => c.parentId === deptId);
+
+    // Searching the category box should surface matches wherever they live,
+    // auto-expanding just the departments that contain one.
+    const visibleDepts = departments.filter(dept => {
+      if(!q) return true;
+      return matches(dept) || childrenOf(dept.id).some(matches);
     });
+    if(q){
+      visibleDepts.forEach(dept => {
+        if(childrenOf(dept.id).some(matches)) expandedDepts.add(dept.id);
+      });
+    }
+
+    const totalCats = categories.filter(c => c.id !== 'tab-0').length;
+    const shownCats = visibleDepts.reduce((n, d) => n + 1 + childrenOf(d.id).filter(matches).length, 0);
     if(els.categorySummary){
-      const totalCats = categories.filter(c => c.id !== 'tab-0').length;
-      const shownCats = visibleCategories.filter(c => c.id !== 'tab-0').length;
       els.categorySummary.innerHTML = '<span>'+shownCats+' of '+totalCats+' categories</span><span>'+tools.length.toLocaleString()+' tools</span>';
     }
-    if(!visibleCategories.length){
+    if(!visibleDepts.length && (!master || !matches(master))){
       els.tabs.innerHTML = '<div class="category-empty">No matching categories.</div>';
       return;
     }
-    els.tabs.innerHTML = visibleCategories.map(cat => `
-      <button class="tab-btn ${cat.id === activeTab ? 'active' : ''}" data-tab="${escapeHtml(cat.id)}" role="tab" aria-selected="${cat.id === activeTab ? 'true' : 'false'}" title="${escapeHtml(cat.label)}">
+
+    function tabButtonHtml(cat, extraClass){
+      const active = cat.id === activeTab;
+      return `<button class="tab-btn ${extraClass||''} ${active ? 'active' : ''}" data-tab="${escapeHtml(cat.id)}" role="tab" aria-selected="${active ? 'true' : 'false'}" title="${escapeHtml(cat.label)}">
         <span class="tab-btn-label">${escapeHtml(cat.label)}</span> <span class="tab-count">${cat.count}</span>
-      </button>
-    `).join('');
+      </button>`;
+    }
+
+    const showMaster = master && matches(master);
+    const masterHtml = showMaster ? `<div class="tab-group tab-group-master">${tabButtonHtml(master)}</div>` : '';
+
+    const deptsHtml = visibleDepts.map(dept => {
+      const kids = childrenOf(dept.id).filter(matches);
+      const expanded = expandedDepts.has(dept.id);
+      const childrenId = 'tab-children-' + dept.id;
+      return `
+        <div class="tab-group" data-dept="${escapeHtml(dept.id)}">
+          <div class="tab-row">
+            ${tabButtonHtml(dept, 'tab-btn-dept')}
+            <button type="button" class="tab-disclosure ${expanded ? 'expanded' : ''}" data-disclosure="${escapeHtml(dept.id)}" aria-expanded="${expanded ? 'true' : 'false'}" aria-controls="${childrenId}" aria-label="${expanded ? 'Collapse' : 'Expand'} ${escapeHtml(dept.label)} categories">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <div class="tab-children" id="${childrenId}" ${expanded ? '' : 'hidden'}>
+            ${kids.map(k => tabButtonHtml(k, 'tab-btn-child')).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    els.tabs.innerHTML = masterHtml + deptsHtml;
+
+    els.tabs.querySelectorAll('.tab-disclosure').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const deptId = btn.dataset.disclosure;
+        if(expandedDepts.has(deptId)) expandedDepts.delete(deptId);
+        else expandedDepts.add(deptId);
+        renderTabs();
+      });
+    });
   }
 
   function filterTools(){
@@ -488,6 +555,13 @@ window.initTools = async function() {
       if(!validGroups.has(activeGroup)) activeGroup = 'all';
     }
     renderedTools = filterTools();
+
+    // Reset how many cards are revealed whenever the actual result set changes
+    // (new tab/category/search/sort/filter) -- but not when re-rendering just
+    // because "Show more" was clicked with the same result set.
+    const renderKey = [activeTab, activeGroup, searchQuery, sortMode, activePreset, JSON.stringify(advFilters)].join('|');
+    if (renderKey !== lastRenderKey) { visibleCount = CARD_PAGE_SIZE; lastRenderKey = renderKey; }
+
     const cat = getCurrentCategory();
     if (els.categoryTitle) els.categoryTitle.textContent = cat.label;
     if (els.categorySubtitle) els.categorySubtitle.textContent = '';
@@ -506,21 +580,55 @@ window.initTools = async function() {
       return;
     }
 
-    const groups = new Map();
+    // Render only the first `visibleCount` results at a time instead of every
+    // matched tool at once -- Master List alone is 2,324 cards, which used to
+    // paint ~43k DOM nodes on every visit regardless of what the user asked for.
+    const visibleTools = renderedTools.slice(0, visibleCount);
+    const remaining = renderedTools.length - visibleTools.length;
+
+    // Group headers still report each group's TRUE total across the full
+    // filtered set, not just how many of it happen to be visible so far.
+    const trueGroupCounts = new Map();
     renderedTools.forEach(tool => {
+      const group = getPrimaryGroup(tool, activeTab);
+      trueGroupCounts.set(group, (trueGroupCounts.get(group) || 0) + 1);
+    });
+
+    const groups = new Map();
+    visibleTools.forEach(tool => {
       const group = getPrimaryGroup(tool, activeTab);
       if(!groups.has(group)) groups.set(group, []);
       groups.get(group).push(tool);
     });
 
-    els.content.innerHTML = controlsHtml + [...groups.entries()].map(([group, groupTools]) => `
+    const loadMoreHtml = remaining > 0 ? `
+      <div class="load-more-row">
+        <button type="button" class="load-more-btn" id="tools-loadMore">
+          Show ${Math.min(CARD_PAGE_SIZE, remaining)} more <span class="load-more-remaining">(${remaining} left)</span>
+        </button>
+      </div>
+    ` : '';
+
+    els.content.innerHTML = controlsHtml + [...groups.entries()].map(([group, groupTools]) => {
+      const trueCount = trueGroupCounts.get(group);
+      const countLabel = groupTools.length === trueCount ? String(trueCount) : `${groupTools.length} of ${trueCount}`;
+      return `
       <section class="group-block">
-        <h3 class="group-heading">${escapeHtml(group)} <span class="group-count">${groupTools.length}</span></h3>
+        <h3 class="group-heading">${escapeHtml(group)} <span class="group-count">${countLabel}</span></h3>
         <div class="tool-grid">
           ${groupTools.map(renderCard).join('')}
         </div>
       </section>
-    `).join('');
+    `;
+    }).join('') + loadMoreHtml;
+
+    const loadMoreBtn = document.getElementById('tools-loadMore');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        visibleCount += CARD_PAGE_SIZE;
+        renderContent();
+      });
+    }
   }
 
   function updateCompareBar(){
@@ -1084,6 +1192,13 @@ window.addEventListener('hub-message', function(e){
       if(msg.category){
         var tb = els.tabs.querySelector('.tab-btn[data-tab="'+CSS.escape(msg.category)+'"]');
         if(tb) tb.click();
+      }
+      // The target tool may sit past the incrementally-rendered page -- reveal
+      // however many cards are needed to include it before trying to scroll.
+      var targetIndex = renderedTools.findIndex(function(t){ return t.id === msg.id; });
+      if(targetIndex > -1 && targetIndex >= visibleCount){
+        visibleCount = Math.ceil((targetIndex + 1) / CARD_PAGE_SIZE) * CARD_PAGE_SIZE;
+        renderContent();
       }
       requestAnimationFrame(function(){
         var el = els.content.querySelector('.tool-card[data-tool-id="'+CSS.escape(msg.id)+'"]');

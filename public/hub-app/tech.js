@@ -10,6 +10,7 @@ window.initTech = async function() {
 
     const CATEGORIES = [{"id":"all","label":"All Technologies","icon":"🌐"},{"id":"programming_languages","label":"Programming Languages","icon":"📝"},{"id":"runtimes_edge_wasm","label":"Runtimes, Edge & WebAssembly","icon":"🌍"},{"id":"js_ts_packages","label":"JavaScript & TypeScript Packages","icon":"📦"},{"id":"python_packages","label":"Python Packages","icon":"🐍"},{"id":"frontend_ui","label":"Frontend Frameworks & UI","icon":"🎨"},{"id":"fullstack_web","label":"Full-Stack Web Frameworks","icon":"🔄"},{"id":"backend_servers","label":"Backend Frameworks & Servers","icon":"⚙️"},{"id":"mobile_desktop","label":"Mobile & Desktop Development","icon":"📱"},{"id":"databases_storage_search","label":"Databases, Storage & Search","icon":"🗄️"},{"id":"ai_ml_data_science","label":"AI, ML & Data Science","icon":"🤖"},{"id":"data_eng_analytics","label":"Data Engineering & Analytics","icon":"📊"},{"id":"apis_sdks_dev_platforms","label":"APIs, SDKs & Developer Platforms","icon":"🔌"},{"id":"cloud_hosting","label":"Cloud Platforms & Hosting","icon":"☁️"},{"id":"devops_infra","label":"DevOps, Containers & Infrastructure","icon":"🐳"},{"id":"build_package_release","label":"Build, Package & Release Tools","icon":"📦"},{"id":"testing_qa","label":"Testing & Quality Assurance","icon":"🧪"},{"id":"monitoring_observability","label":"Monitoring & Observability","icon":"📈"},{"id":"security_auth_identity","label":"Security, Auth & Identity","icon":"🔐"},{"id":"messaging_queues_workflows","label":"Messaging, Queues & Workflows","icon":"📬"},{"id":"cms_wordpress_commerce","label":"CMS, WordPress & Commerce","icon":"🟦"},{"id":"browser_ide_extensions","label":"Browser & IDE Extensions","icon":"🧩"},{"id":"design_figma_creative","label":"Design, Figma & Creative Tools","icon":"🎨"},{"id":"docs_knowledge_collab","label":"Docs, Knowledge & Collaboration","icon":"📚"},{"id":"payments_billing","label":"Payments & Billing","icon":"💳"},{"id":"blockchain_web3_crypto","label":"Blockchain, Web3 & Crypto","icon":"⛓️"},{"id":"iot_embedded_hardware","label":"IoT, Embedded & Hardware","icon":"🔌"},{"id":"game_development","label":"Game Development","icon":"🎮"},{"id":"lowcode_nocode_baas","label":"Low-Code, No-Code & BaaS","icon":"🧱"},{"id":"self_hosted_open_source","label":"Self-Hosted & Open-Source Tools","icon":"🏠"}];
 
+    const CARD_PAGE_SIZE = 60;
     let activeTab = 'all';
     let activeGroup = 'all';
     let activePreset = 'all';
@@ -19,6 +20,8 @@ window.initTech = async function() {
     let sortMode = 'recommended';
     let advancedOpen = false;
     let advFilters = {type:'all', ecosystem:'all', platform:'all', open_source:'all', use_case:'all'};
+    let visibleCount = CARD_PAGE_SIZE;
+    let lastRenderKey = '';
 
     const els = {
       tabs: document.getElementById('tech-tabs'),
@@ -312,6 +315,10 @@ window.initTech = async function() {
         }
       }
       filtered = sortItems(filtered);
+
+      const renderKey = [activeTab, activeGroup, searchQuery, sortMode, activePreset, JSON.stringify(advFilters)].join('|');
+      if (renderKey !== lastRenderKey) { visibleCount = CARD_PAGE_SIZE; lastRenderKey = renderKey; }
+
       const controlsHtml = renderTechRecommendedViews() + renderControls(baseItems);
       const isFiltered = filtered.length !== raw.length;
       if(window.hubSetResultChip){
@@ -331,7 +338,26 @@ window.initTech = async function() {
         });
         els.content.innerHTML = html;
       } else {
-        els.content.innerHTML = controlsHtml + `<div class="tech-grid">${filtered.map(buildCard).join('')}</div>`;
+        // A single active category (e.g. CMS/WordPress at 261 items, Browser &
+        // IDE Extensions at 225) used to render every match at once. Reveal
+        // incrementally instead, same pattern as the AI Tools grid.
+        const visible = filtered.slice(0, visibleCount);
+        const remaining = filtered.length - visible.length;
+        const loadMoreHtml = remaining > 0 ? `
+          <div class="load-more-row">
+            <button type="button" class="load-more-btn" id="tech-loadMore">
+              Show ${Math.min(CARD_PAGE_SIZE, remaining)} more <span class="load-more-remaining">(${remaining} left)</span>
+            </button>
+          </div>
+        ` : '';
+        els.content.innerHTML = controlsHtml + `<div class="tech-grid">${visible.map(buildCard).join('')}</div>` + loadMoreHtml;
+        const loadMoreBtn = document.getElementById('tech-loadMore');
+        if (loadMoreBtn) {
+          loadMoreBtn.addEventListener('click', () => {
+            visibleCount += CARD_PAGE_SIZE;
+            render();
+          });
+        }
       }
     }
 
@@ -425,6 +451,15 @@ window.initTech = async function() {
         const targetCategory = msg.category || (target && target.category);
         if(targetCategory && targetCategory !== activeTab){ activeTab = targetCategory; activeGroup = 'all'; renderAll(); }
         else if(activeTab === 'all' && targetCategory){ activeTab = targetCategory; activeGroup = 'all'; renderAll(); }
+        // The target item may sit past the incrementally-rendered page --
+        // reveal however many cards are needed to include it first.
+        if(!document.getElementById('tc-'+msg.id)){
+          const idx = raw.filter(matches).findIndex(t => t.id === msg.id);
+          if(idx > -1 && idx >= visibleCount){
+            visibleCount = Math.ceil((idx + 1) / CARD_PAGE_SIZE) * CARD_PAGE_SIZE;
+            render();
+          }
+        }
         requestAnimationFrame(function(){
           const el = document.getElementById('tc-'+msg.id);
           if(el){
