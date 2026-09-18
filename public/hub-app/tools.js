@@ -596,7 +596,8 @@ window.initTools = async function() {
         </div>
         <div class="tool-uc">${escapeHtml(displayDesc)}</div>
         <div class="tool-tags">
-          ${displayTags.map(item => `<span class="tool-tag ${escapeHtml(item.cls)}">${escapeHtml(item.label)}</span>`).join('')}
+          ${displayTags.slice(0, 3).map(item => `<span class="tool-tag ${escapeHtml(item.cls)}">${escapeHtml(item.label)}</span>`).join('')}
+          ${displayTags.length > 3 ? `<span class="tool-tag tool-tag-more" title="${escapeHtml(displayTags.slice(3).map(t => t.label).join(', '))}">+${displayTags.length - 3}</span>` : ''}
         </div>
       </article>
     `;
