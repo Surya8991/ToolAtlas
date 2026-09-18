@@ -351,19 +351,28 @@ window.initTools = async function() {
     scrollSectionTop();
   }
 
-  // Departments start collapsed -- 9 department rows (+ Master List) read as
-  // one screenful instead of the 56 flat, undifferentiated categories this
-  // sidebar used to render. Persisted across re-renders in this closure so
-  // toggling one department doesn't reset every other one.
-  const expandedDepts = new Set();
+  // Declutter: at most ONE department's subcategories are ever open at a
+  // time, as a floating dropdown rather than an inline block that pushes
+  // the rest of the sidebar down. Master List + 9 department rows is the
+  // whole resting sidebar -- 10 rows, always, browsing or not.
+  let openDept = null;
+  // While actively searching the category box, matches can live in several
+  // departments at once, so search results render inline (not as a single
+  // dropdown) -- the one case where showing more, not less, is correct.
+  const searchExpandedDepts = new Set();
 
-  function ensureActiveDeptExpanded(){
+  function ensureActiveDeptOpen(){
     const active = categories.find(c => c.id === activeTab);
-    if(active && active.parentId) expandedDepts.add(active.parentId);
+    if(active && active.parentId) openDept = active.parentId;
+  }
+
+  function closeDeptDropdown(){
+    if(!openDept) return;
+    openDept = null;
+    renderTabs();
   }
 
   function renderTabs(){
-    ensureActiveDeptExpanded();
     const q = normalize(categoryQuery);
     const matches = cat => {
       if(!q) return true;
@@ -376,14 +385,15 @@ window.initTools = async function() {
     const childrenOf = deptId => categories.filter(c => c.parentId === deptId);
 
     // Searching the category box should surface matches wherever they live,
-    // auto-expanding just the departments that contain one.
+    // rendering inline for every department that has one.
     const visibleDepts = departments.filter(dept => {
       if(!q) return true;
       return matches(dept) || childrenOf(dept.id).some(matches);
     });
+    searchExpandedDepts.clear();
     if(q){
       visibleDepts.forEach(dept => {
-        if(childrenOf(dept.id).some(matches)) expandedDepts.add(dept.id);
+        if(childrenOf(dept.id).some(matches)) searchExpandedDepts.add(dept.id);
       });
     }
 
@@ -409,17 +419,18 @@ window.initTools = async function() {
 
     const deptsHtml = visibleDepts.map(dept => {
       const kids = childrenOf(dept.id).filter(matches);
-      const expanded = expandedDepts.has(dept.id);
+      const isSearchMode = !!q;
+      const open = isSearchMode ? searchExpandedDepts.has(dept.id) : openDept === dept.id;
       const childrenId = 'tab-children-' + dept.id;
       return `
-        <div class="tab-group" data-dept="${escapeHtml(dept.id)}">
+        <div class="tab-group ${isSearchMode ? 'is-search' : ''}" data-dept="${escapeHtml(dept.id)}">
           <div class="tab-row">
             ${tabButtonHtml(dept, 'tab-btn-dept')}
-            <button type="button" class="tab-disclosure ${expanded ? 'expanded' : ''}" data-disclosure="${escapeHtml(dept.id)}" aria-expanded="${expanded ? 'true' : 'false'}" aria-controls="${childrenId}" aria-label="${expanded ? 'Collapse' : 'Expand'} ${escapeHtml(dept.label)} categories">
+            <button type="button" class="tab-disclosure ${open ? 'expanded' : ''}" data-disclosure="${escapeHtml(dept.id)}" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${childrenId}" aria-haspopup="${isSearchMode ? 'false' : 'true'}" aria-label="${open ? 'Close' : 'Open'} ${escapeHtml(dept.label)} categories">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
             </button>
           </div>
-          <div class="tab-children" id="${childrenId}" ${expanded ? '' : 'hidden'}>
+          <div class="tab-children ${isSearchMode ? 'tab-children-inline' : 'tab-children-dropdown'}" id="${childrenId}" ${open ? '' : 'hidden'}>
             ${kids.map(k => tabButtonHtml(k, 'tab-btn-child')).join('')}
           </div>
         </div>
@@ -431,13 +442,45 @@ window.initTools = async function() {
     els.tabs.querySelectorAll('.tab-disclosure').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
+        if(normalize(categoryQuery)) return; // search mode: nothing to toggle, everything relevant is already open
         const deptId = btn.dataset.disclosure;
-        if(expandedDepts.has(deptId)) expandedDepts.delete(deptId);
-        else expandedDepts.add(deptId);
+        openDept = (openDept === deptId) ? null : deptId;
         renderTabs();
       });
     });
+
+    // Also open a department's dropdown by clicking its row (not just the
+    // chevron) when it isn't already the active category -- the whole row
+    // is the affordance, the chevron is just its visible indicator.
+    els.tabs.querySelectorAll('.tab-btn-dept').forEach(btn => {
+      btn.addEventListener('click', e => {
+        if(normalize(categoryQuery)) return;
+        const group = btn.closest('.tab-group');
+        const deptId = group && group.dataset.dept;
+        if(!deptId) return;
+        // Let the existing tab-click handler apply the filter; just also
+        // make sure this department's dropdown is the one left open.
+        if(openDept !== deptId){ openDept = deptId; }
+      }, {capture: true});
+    });
   }
+
+  // Close whichever dropdown is open when the user clicks anywhere outside
+  // the sidebar's category tree. Uses composedPath() (the propagation path
+  // captured at dispatch time), not els.tabs.contains(e.target): clicking a
+  // department re-renders els.tabs's innerHTML while this same click is
+  // still bubbling, which detaches the original target node -- contains()
+  // on a detached node returns false even for a click that started inside
+  // the sidebar, which was closing the dropdown the same click had just opened.
+  document.addEventListener('click', e => {
+    if(!openDept) return;
+    const path = typeof e.composedPath === 'function' ? e.composedPath() : [];
+    if(path.includes(els.tabs)) return;
+    closeDeptDropdown();
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && openDept) closeDeptDropdown();
+  });
 
   function filterTools(){
     let filtered = tools.filter(tool => toolInTab(tool, activeTab));
@@ -1023,6 +1066,10 @@ window.initTools = async function() {
   els.tabs.addEventListener('click', e => {
     const btn = e.target.closest('.tab-btn');
     if(!btn) return;
+    // Picking a leaf category closes its dropdown (the choice is made);
+    // picking a department keeps it open so its children stay one click
+    // away for further refinement.
+    if(btn.classList.contains('tab-btn-child')) openDept = null;
     activePreset = 'custom';
     activeTab = btn.dataset.tab;
     activeGroup = 'all';
@@ -1153,6 +1200,7 @@ els.recentStrip.addEventListener('click', function(e){
   });
 
   renderRecentStrip();
+  ensureActiveDeptOpen();
   renderTabs();
   renderContent();
 

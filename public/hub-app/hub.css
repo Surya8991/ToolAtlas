@@ -590,11 +590,12 @@ h1{margin:0;font-size:clamp(25px,2.4vw,34px);line-height:1.05;font-weight:900;le
 .tab-count{background:#eef4ff;color:var(--accent-hover);padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:900;font-variant-numeric:tabular-nums}
 .tab-btn.active .tab-count{background:rgba(255,255,255,.20);color:rgba(255,255,255,.95)}
 
-/* Department tree: a department row (bold, full-width) plus a disclosure
-   toggle, with its subcategories indented and visually subordinate when
-   expanded. Fixes the sidebar rendering every category at one flat, equal
-   weight regardless of whether it's a department or a leaf. */
-.tab-group{display:grid;gap:4px}
+/* Department dropdown: a department row (bold, full-width) plus a
+   disclosure toggle. Its subcategories open as a floating popover, not an
+   inline block that pushes the rest of the sidebar down -- the resting
+   sidebar is always Master List + 9 department rows, browsing or not. At
+   most one dropdown is ever open (tools.js enforces this). */
+.tab-group{display:grid;gap:4px;position:relative}
 .tab-group-master{padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid #e1d8c1}
 .tab-row{display:flex;align-items:stretch;gap:4px}
 .tab-row .tab-btn-dept{flex:1;font-size:13px}
@@ -602,13 +603,22 @@ h1{margin:0;font-size:clamp(25px,2.4vw,34px);line-height:1.05;font-weight:900;le
 .tab-disclosure:hover{background:#f5eedb;border-color:#e8dcc0;color:#6b5527}
 .tab-disclosure svg{transition:transform .16s ease}
 .tab-disclosure.expanded svg{transform:rotate(90deg)}
-/* :not([hidden]) rather than a bare .tab-children{display:grid}: an author
-   rule at equal specificity to the UA stylesheet's [hidden]{display:none}
-   still wins over it, so a bare display:grid here was silently showing
-   every department's children regardless of the hidden attribute JS sets. */
-.tab-children:not([hidden]){display:grid;gap:3px;padding-left:16px;border-left:2px solid #eef2f7;margin-left:14px}
 .tab-btn-child{min-height:33px;padding:6px 10px 6px 12px;font-size:11.5px;font-weight:700;color:#5c5646}
 .tab-btn-child.active{box-shadow:0 4px 12px rgba(156,122,63,.18),inset 0 1px 0 rgba(255,255,255,.18)}
+
+/* :not([hidden]) rather than a bare {display:...}: an author rule at equal
+   specificity to the UA stylesheet's [hidden]{display:none} still wins
+   over it, which previously showed every department's children regardless
+   of the hidden attribute JS sets. */
+.tab-children-dropdown:not([hidden]){
+  display:grid; gap:2px;
+  position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:40;
+  background:var(--surface); border:1px solid var(--border-strong); border-radius:12px;
+  padding:8px; box-shadow:0 16px 36px rgba(28,20,8,.16);
+  animation:dropdownOpen .14s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes dropdownOpen{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.tab-children-inline:not([hidden]){display:grid;gap:3px;padding-left:16px;border-left:2px solid #eef2f7;margin-left:14px}
 
 main{min-width:0}
 .category-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
