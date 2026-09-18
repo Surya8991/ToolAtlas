@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const REPO = "https://github.com/Surya8991/Master-Tools-Hub";
+const REPO = "https://github.com/Surya8991/ToolAtlas";
 
 export default function SiteFooter() {
   return (
@@ -13,7 +13,7 @@ export default function SiteFooter() {
                 <path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z" />
               </svg>
             </span>
-            ToolForge
+            ToolAtlas
           </div>
           <p className="footer-tagline">
             The developer&apos;s catalog for AI tools and technology stacks. Curated, searchable, always free.
@@ -48,16 +48,16 @@ export default function SiteFooter() {
         <div>
           <div className="footer-col-title">Tech Stack</div>
           <ul className="footer-links">
-            <li><Link href="/hub#tech">Frontend</Link></li>
-            <li><Link href="/hub#tech">Backend</Link></li>
-            <li><Link href="/hub#tech">Databases</Link></li>
-            <li><Link href="/hub#tech">DevOps</Link></li>
-            <li><Link href="/hub#tech">Mobile</Link></li>
+            <li><Link href="/hub#tech/frontend_ui">Frontend</Link></li>
+            <li><Link href="/hub#tech/backend_servers">Backend</Link></li>
+            <li><Link href="/hub#tech/databases_storage_search">Databases</Link></li>
+            <li><Link href="/hub#tech/devops_infra">DevOps</Link></li>
+            <li><Link href="/hub#tech/mobile_desktop">Mobile</Link></li>
           </ul>
         </div>
       </div>
       <div className="footer-bottom">
-        <p className="footer-copyright">© 2026 ToolForge. Built for the developer community.</p>
+        <p className="footer-copyright">© 2026 ToolAtlas. Built for the developer community.</p>
         <div className="footer-bottom-links">
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>

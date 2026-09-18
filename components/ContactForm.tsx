@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconCheckCircle } from "@/components/icons";
 
 export default function ContactForm() {
   const [sent, setSent] = useState(false);
@@ -22,8 +23,8 @@ export default function ContactForm() {
 
     const body = [`Name: ${name}`, `Email: ${email}`, `Subject: ${subject}`, "", message].join("\n");
     const href =
-      "mailto:contact@toolforge.dev" +
-      "?subject=" + encodeURIComponent("[ToolForge] " + subject) +
+      "mailto:contact@toolatlas.dev" +
+      "?subject=" + encodeURIComponent("[ToolAtlas] " + subject) +
       "&body=" + encodeURIComponent(body);
     window.location.href = href;
     setTimeout(() => setSent(true), 400);
@@ -33,7 +34,7 @@ export default function ContactForm() {
     return (
       <div className="contact-form-card">
         <div className="form-success" style={{ display: "block" }} aria-live="polite">
-          <div className="form-success-icon" aria-hidden="true">🎉</div>
+          <div className="form-success-icon" aria-hidden="true"><IconCheckCircle width={28} height={28} /></div>
           <h3 className="form-success-title">Message ready to send!</h3>
           <p className="form-success-msg">
             Your email client should have opened with everything filled in.<br />
@@ -64,12 +65,12 @@ export default function ContactForm() {
           <label htmlFor="cf-subject">Subject <span aria-hidden="true" style={{ color: "#f87171" }}>*</span></label>
           <select id="cf-subject" name="subject" defaultValue="">
             <option value="" disabled>Choose a topic…</option>
-            <option value="Bug Report">🐛 Bug Report</option>
-            <option value="Tool Request">🔧 Tool / Tech Suggestion</option>
-            <option value="Feature Request">✨ Feature Request</option>
-            <option value="Data Correction">📝 Data Correction</option>
-            <option value="Partnership">🤝 Partnership / Collaboration</option>
-            <option value="General">💬 General Enquiry</option>
+            <option value="Bug Report">Bug Report</option>
+            <option value="Tool Request">Tool / Tech Suggestion</option>
+            <option value="Feature Request">Feature Request</option>
+            <option value="Data Correction">Data Correction</option>
+            <option value="Partnership">Partnership / Collaboration</option>
+            <option value="General">General Enquiry</option>
           </select>
         </div>
         <div className="form-field">

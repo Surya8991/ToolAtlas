@@ -86,11 +86,18 @@ window.initTools = async function() {
   let presetQuery = '';
   let sortMode = 'recommended';
   let advancedOpen = false;
+  // Collapsed by default so the "Recommended views" panel doesn't push real
+  // results down on every visit -- opens automatically once a preset is
+  // actually chosen (applyToolPreset), and freely toggleable after that.
+  let recommendedOpen = false;
   let advFilters = {pricing:'all', platform:'all', user:'all', availability:'all', status:'all'};
   let renderedTools = [];
+  let visibleCount = CARD_PAGE_SIZE;
+  let lastRenderKey = '';
   let searchQuery = '';
   let selectedCompare = new Set();
   let lastToolFocus = null;
+  let lastCompareFocus = null;
   let currentDensity = 'default';
   try { currentDensity = localStorage.getItem(DENSITY_KEY) || 'default'; } catch(e) {}
 
@@ -195,9 +202,17 @@ window.initTools = async function() {
   ];
 
   function renderRecommendedViews(){
-    return `<div class="recommended-panel" aria-label="Recommended views">
-      <div class="recommended-head"><span class="filter-kicker">Start here</span><strong>Recommended views</strong><span>Pick a ready-made lens instead of browsing ${tools.length.toLocaleString()} cards.</span></div>
-      <div class="preset-grid">${TOOL_PRESETS.map(p=>`<button type="button" class="preset-chip ${activePreset===p.key?'active':''}" data-preset="${escapeHtml(p.key)}">${escapeHtml(p.label)}</button>`).join('')}</div>
+    const activeChoice = TOOL_PRESETS.find(p => p.key === activePreset);
+    return `<div class="recommended-panel ${recommendedOpen ? 'open' : ''}" aria-label="Recommended views">
+      <button type="button" class="recommended-toggle" id="tools-recommendedToggle" aria-expanded="${recommendedOpen ? 'true' : 'false'}" aria-controls="tools-recommendedBody">
+        <span class="filter-kicker">Start here</span>
+        <strong>Recommended views</strong>
+        ${activeChoice ? `<span class="recommended-active-pill">${escapeHtml(activeChoice.label)}</span>` : `<span class="recommended-hint">Ready-made lenses instead of browsing ${tools.length.toLocaleString()} cards</span>`}
+        <svg class="recommended-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="recommended-body" id="tools-recommendedBody" ${recommendedOpen ? '' : 'hidden'}>
+        <div class="preset-grid">${TOOL_PRESETS.map(p=>`<button type="button" class="preset-chip ${activePreset===p.key?'active':''}" data-preset="${escapeHtml(p.key)}">${escapeHtml(p.label)}</button>`).join('')}</div>
+      </div>
     </div>`;
   }
 
@@ -214,6 +229,7 @@ window.initTools = async function() {
     advFilters = {pricing:'all', platform:'all', user:'all', availability:'all', status:'all'};
     if(sortMode === 'free') advFilters.availability = 'free';
     if(sortMode === 'open_source') advFilters.availability = 'open_source';
+    recommendedOpen = true;
     renderTabs();
     renderContent();
     scrollSectionTop();
@@ -302,10 +318,6 @@ window.initTools = async function() {
               <option value="editor" ${sortMode==='editor'?'selected':''}>Editor's choice first</option>
               <option value="developer" ${sortMode==='developer'?'selected':''}>Developer picks first</option>
               <option value="popular" ${sortMode==='popular'?'selected':''}>Popular</option>
-              <option value="free" ${sortMode==='free'?'selected':''}>Free first</option>
-              <option value="open_source" ${sortMode==='open_source'?'selected':''}>Open source first</option>
-              <option value="website" ${sortMode==='website'?'selected':''}>Websites only</option>
-              <option value="tool" ${sortMode==='tool'?'selected':''}>Tools only</option>
               <option value="verified" ${sortMode==='verified'?'selected':''}>Recently verified</option>
               <option value="az" ${sortMode==='az'?'selected':''}>A-Z</option>
             </select>
@@ -345,6 +357,7 @@ window.initTools = async function() {
     categoryQuery = '';
     sortMode = 'recommended';
     advancedOpen = false;
+    recommendedOpen = false;
     advFilters = {pricing:'all', platform:'all', user:'all', availability:'all', status:'all'};
     if(els.categorySearch) els.categorySearch.value = '';
     renderTabs();
@@ -352,28 +365,136 @@ window.initTools = async function() {
     scrollSectionTop();
   }
 
+  // Declutter: at most ONE department's subcategories are ever open at a
+  // time, as a floating dropdown rather than an inline block that pushes
+  // the rest of the sidebar down. Master List + 9 department rows is the
+  // whole resting sidebar -- 10 rows, always, browsing or not.
+  let openDept = null;
+  // While actively searching the category box, matches can live in several
+  // departments at once, so search results render inline (not as a single
+  // dropdown) -- the one case where showing more, not less, is correct.
+  const searchExpandedDepts = new Set();
+
+  function ensureActiveDeptOpen(){
+    const active = categories.find(c => c.id === activeTab);
+    if(active && active.parentId) openDept = active.parentId;
+  }
+
+  function closeDeptDropdown(){
+    if(!openDept) return;
+    openDept = null;
+    renderTabs();
+  }
+
   function renderTabs(){
     const q = normalize(categoryQuery);
-    const visibleCategories = categories.filter(cat => {
+    const matches = cat => {
       if(!q) return true;
       const label = normalize(cat.label || '');
       return label.includes(q) || String(cat.count || '').includes(q);
+    };
+
+    const master = categories.find(c => c.id === 'tab-0');
+    const departments = categories.filter(c => c.parentId === null && c.id !== 'tab-0');
+    const childrenOf = deptId => categories.filter(c => c.parentId === deptId);
+
+    // Searching the category box should surface matches wherever they live,
+    // rendering inline for every department that has one.
+    const visibleDepts = departments.filter(dept => {
+      if(!q) return true;
+      return matches(dept) || childrenOf(dept.id).some(matches);
     });
+    searchExpandedDepts.clear();
+    if(q){
+      visibleDepts.forEach(dept => {
+        if(childrenOf(dept.id).some(matches)) searchExpandedDepts.add(dept.id);
+      });
+    }
+
+    const totalCats = categories.filter(c => c.id !== 'tab-0').length;
+    const shownCats = visibleDepts.reduce((n, d) => n + 1 + childrenOf(d.id).filter(matches).length, 0);
     if(els.categorySummary){
-      const totalCats = categories.filter(c => c.id !== 'tab-0').length;
-      const shownCats = visibleCategories.filter(c => c.id !== 'tab-0').length;
       els.categorySummary.innerHTML = '<span>'+shownCats+' of '+totalCats+' categories</span><span>'+tools.length.toLocaleString()+' tools</span>';
     }
-    if(!visibleCategories.length){
+    if(!visibleDepts.length && (!master || !matches(master))){
       els.tabs.innerHTML = '<div class="category-empty">No matching categories.</div>';
       return;
     }
-    els.tabs.innerHTML = visibleCategories.map(cat => `
-      <button class="tab-btn ${cat.id === activeTab ? 'active' : ''}" data-tab="${escapeHtml(cat.id)}" role="tab" aria-selected="${cat.id === activeTab ? 'true' : 'false'}" title="${escapeHtml(cat.label)}">
+
+    function tabButtonHtml(cat, extraClass){
+      const active = cat.id === activeTab;
+      return `<button class="tab-btn ${extraClass||''} ${active ? 'active' : ''}" data-tab="${escapeHtml(cat.id)}" role="tab" aria-selected="${active ? 'true' : 'false'}" title="${escapeHtml(cat.label)}">
         <span class="tab-btn-label">${escapeHtml(cat.label)}</span> <span class="tab-count">${cat.count}</span>
-      </button>
-    `).join('');
+      </button>`;
+    }
+
+    const showMaster = master && matches(master);
+    const masterHtml = showMaster ? `<div class="tab-group tab-group-master">${tabButtonHtml(master)}</div>` : '';
+
+    const deptsHtml = visibleDepts.map(dept => {
+      const kids = childrenOf(dept.id).filter(matches);
+      const isSearchMode = !!q;
+      const open = isSearchMode ? searchExpandedDepts.has(dept.id) : openDept === dept.id;
+      const childrenId = 'tab-children-' + dept.id;
+      return `
+        <div class="tab-group ${isSearchMode ? 'is-search' : ''}" data-dept="${escapeHtml(dept.id)}">
+          <div class="tab-row">
+            ${tabButtonHtml(dept, 'tab-btn-dept')}
+            <button type="button" class="tab-disclosure ${open ? 'expanded' : ''}" data-disclosure="${escapeHtml(dept.id)}" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${childrenId}" aria-haspopup="${isSearchMode ? 'false' : 'true'}" aria-label="${open ? 'Close' : 'Open'} ${escapeHtml(dept.label)} categories">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <div class="tab-children ${isSearchMode ? 'tab-children-inline' : 'tab-children-dropdown'}" id="${childrenId}" ${open ? '' : 'hidden'}>
+            ${kids.map(k => tabButtonHtml(k, 'tab-btn-child')).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    els.tabs.innerHTML = masterHtml + deptsHtml;
+
+    els.tabs.querySelectorAll('.tab-disclosure').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        if(normalize(categoryQuery)) return; // search mode: nothing to toggle, everything relevant is already open
+        const deptId = btn.dataset.disclosure;
+        openDept = (openDept === deptId) ? null : deptId;
+        renderTabs();
+      });
+    });
+
+    // Also open a department's dropdown by clicking its row (not just the
+    // chevron) when it isn't already the active category -- the whole row
+    // is the affordance, the chevron is just its visible indicator.
+    els.tabs.querySelectorAll('.tab-btn-dept').forEach(btn => {
+      btn.addEventListener('click', e => {
+        if(normalize(categoryQuery)) return;
+        const group = btn.closest('.tab-group');
+        const deptId = group && group.dataset.dept;
+        if(!deptId) return;
+        // Let the existing tab-click handler apply the filter; just also
+        // make sure this department's dropdown is the one left open.
+        if(openDept !== deptId){ openDept = deptId; }
+      }, {capture: true});
+    });
   }
+
+  // Close whichever dropdown is open when the user clicks anywhere outside
+  // the sidebar's category tree. Uses composedPath() (the propagation path
+  // captured at dispatch time), not els.tabs.contains(e.target): clicking a
+  // department re-renders els.tabs's innerHTML while this same click is
+  // still bubbling, which detaches the original target node -- contains()
+  // on a detached node returns false even for a click that started inside
+  // the sidebar, which was closing the dropdown the same click had just opened.
+  document.addEventListener('click', e => {
+    if(!openDept) return;
+    const path = typeof e.composedPath === 'function' ? e.composedPath() : [];
+    if(path.includes(els.tabs)) return;
+    closeDeptDropdown();
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && openDept) closeDeptDropdown();
+  });
 
   function filterTools(){
     let filtered = tools.filter(tool => toolInTab(tool, activeTab));
@@ -475,7 +596,8 @@ window.initTools = async function() {
         </div>
         <div class="tool-uc">${escapeHtml(displayDesc)}</div>
         <div class="tool-tags">
-          ${displayTags.map(item => `<span class="tool-tag ${escapeHtml(item.cls)}">${escapeHtml(item.label)}</span>`).join('')}
+          ${displayTags.slice(0, 3).map(item => `<span class="tool-tag ${escapeHtml(item.cls)}">${escapeHtml(item.label)}</span>`).join('')}
+          ${displayTags.length > 3 ? `<span class="tool-tag tool-tag-more" title="${escapeHtml(displayTags.slice(3).map(t => t.label).join(', '))}">+${displayTags.length - 3}</span>` : ''}
         </div>
       </article>
     `;
@@ -488,6 +610,13 @@ window.initTools = async function() {
       if(!validGroups.has(activeGroup)) activeGroup = 'all';
     }
     renderedTools = filterTools();
+
+    // Reset how many cards are revealed whenever the actual result set changes
+    // (new tab/category/search/sort/filter) -- but not when re-rendering just
+    // because "Show more" was clicked with the same result set.
+    const renderKey = [activeTab, activeGroup, searchQuery, sortMode, activePreset, JSON.stringify(advFilters)].join('|');
+    if (renderKey !== lastRenderKey) { visibleCount = CARD_PAGE_SIZE; lastRenderKey = renderKey; }
+
     const cat = getCurrentCategory();
     if (els.categoryTitle) els.categoryTitle.textContent = cat.label;
     if (els.categorySubtitle) els.categorySubtitle.textContent = '';
@@ -506,21 +635,55 @@ window.initTools = async function() {
       return;
     }
 
-    const groups = new Map();
+    // Render only the first `visibleCount` results at a time instead of every
+    // matched tool at once -- Master List alone is 2,324 cards, which used to
+    // paint ~43k DOM nodes on every visit regardless of what the user asked for.
+    const visibleTools = renderedTools.slice(0, visibleCount);
+    const remaining = renderedTools.length - visibleTools.length;
+
+    // Group headers still report each group's TRUE total across the full
+    // filtered set, not just how many of it happen to be visible so far.
+    const trueGroupCounts = new Map();
     renderedTools.forEach(tool => {
+      const group = getPrimaryGroup(tool, activeTab);
+      trueGroupCounts.set(group, (trueGroupCounts.get(group) || 0) + 1);
+    });
+
+    const groups = new Map();
+    visibleTools.forEach(tool => {
       const group = getPrimaryGroup(tool, activeTab);
       if(!groups.has(group)) groups.set(group, []);
       groups.get(group).push(tool);
     });
 
-    els.content.innerHTML = controlsHtml + [...groups.entries()].map(([group, groupTools]) => `
+    const loadMoreHtml = remaining > 0 ? `
+      <div class="load-more-row">
+        <button type="button" class="load-more-btn" id="tools-loadMore">
+          Show ${Math.min(CARD_PAGE_SIZE, remaining)} more <span class="load-more-remaining">(${remaining} left)</span>
+        </button>
+      </div>
+    ` : '';
+
+    els.content.innerHTML = controlsHtml + [...groups.entries()].map(([group, groupTools]) => {
+      const trueCount = trueGroupCounts.get(group);
+      const countLabel = groupTools.length === trueCount ? String(trueCount) : `${groupTools.length} of ${trueCount}`;
+      return `
       <section class="group-block">
-        <h3 class="group-heading">${escapeHtml(group)} <span class="group-count">${groupTools.length}</span></h3>
+        <h3 class="group-heading">${escapeHtml(group)} <span class="group-count">${countLabel}</span></h3>
         <div class="tool-grid">
           ${groupTools.map(renderCard).join('')}
         </div>
       </section>
-    `).join('');
+    `;
+    }).join('') + loadMoreHtml;
+
+    const loadMoreBtn = document.getElementById('tools-loadMore');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        visibleCount += CARD_PAGE_SIZE;
+        renderContent();
+      });
+    }
   }
 
   function updateCompareBar(){
@@ -558,7 +721,18 @@ window.initTools = async function() {
         </tbody>
       </table>
     `;
+    lastCompareFocus = document.activeElement;
     els.compareModal.classList.add('active');
+    if(els.modalClose) els.modalClose.focus();
+  }
+
+  function closeCompare(){
+    if(!els.compareModal.classList.contains('active')) return;
+    els.compareModal.classList.remove('active');
+    if(lastCompareFocus && typeof lastCompareFocus.focus === 'function' && document.contains(lastCompareFocus)){
+      try{ lastCompareFocus.focus({preventScroll:true}); }catch(e){ try{ lastCompareFocus.focus(); }catch(_){} }
+    }
+    lastCompareFocus = null;
   }
 
 
@@ -598,7 +772,7 @@ window.initTools = async function() {
   }
 
   function exportCsv(){
-    exportToolRows(getExportRows(renderedTools), 'toolforge-tools-current-view.csv');
+    exportToolRows(getExportRows(renderedTools), 'toolatlas-tools-current-view.csv');
   }
 
   function exportSaved(){
@@ -610,7 +784,7 @@ window.initTools = async function() {
       showToast('No saved tools to export');
       return;
     }
-    exportToolRows(getExportRows(savedTools), 'toolforge-saved-tools.csv');
+    exportToolRows(getExportRows(savedTools), 'toolatlas-saved-tools.csv');
   }
 
   function inferToolGuidance(tool, similar){
@@ -681,7 +855,7 @@ window.initTools = async function() {
       els.tdBody.innerHTML = `
         <div class="td-actions">
           <a class="td-visit-btn" href="${escapeHtml(tool.url || '#')}" target="_blank" rel="noopener">Visit website ↗</a>
-          <button class="td-fav-btn ${isFav ? 'active' : ''}" id="tdFavBtn" type="button"
+          <button class="td-fav-btn ${isFav ? 'active' : ''}" id="tools-tdFavBtn" type="button"
             aria-label="${isFav ? 'Remove from saved' : 'Save tool'}"></button>
         </div>
 
@@ -841,6 +1015,12 @@ window.initTools = async function() {
 
   // Delegated card action handlers (replaces per-card binding)
   els.content.addEventListener('click', e => {
+    const recToggle = e.target.closest('.recommended-toggle');
+    if(recToggle){
+      recommendedOpen = !recommendedOpen;
+      renderContent();
+      return;
+    }
     const presetBtn = e.target.closest('.preset-chip');
     if(presetBtn){
       applyToolPreset(presetBtn.dataset.preset);
@@ -907,6 +1087,10 @@ window.initTools = async function() {
   els.tabs.addEventListener('click', e => {
     const btn = e.target.closest('.tab-btn');
     if(!btn) return;
+    // Picking a leaf category closes its dropdown (the choice is made);
+    // picking a department keeps it open so its children stay one click
+    // away for further refinement.
+    if(btn.classList.contains('tab-btn-child')) openDept = null;
     activePreset = 'custom';
     activeTab = btn.dataset.tab;
     activeGroup = 'all';
@@ -916,6 +1100,11 @@ window.initTools = async function() {
     renderTabs();
     renderContent();
     scrollSectionTop();
+    // Keep the URL in sync with the selected category -- previously the
+    // hash only reflected whatever category the page loaded with, so
+    // clicking around left the address bar pointing at a stale view and
+    // Back exited the hub entirely instead of undoing a category change.
+    try{ history.replaceState(null, '', location.pathname + location.search + '#tools/' + activeTab); }catch(e){}
   });
 
   if(els.categorySearch){
@@ -942,7 +1131,7 @@ window.initTools = async function() {
       if (navSearch) { e.preventDefault(); navSearch.focus(); navSearch.select(); }
     }
     if(e.key === 'Escape') {
-      els.compareModal.classList.remove('active');
+      closeCompare();
       closeToolDetail();
     }
   });
@@ -953,10 +1142,10 @@ window.initTools = async function() {
     updateCompareBar();
     renderContent();
   });
-  els.modalClose.addEventListener('click', () => els.compareModal.classList.remove('active'));
+  els.modalClose.addEventListener('click', closeCompare);
   els.tdClose.addEventListener('click', closeToolDetail);
   els.toolDetailModal.addEventListener('click', e => { if(e.target === els.toolDetailModal) closeToolDetail(); });
-  els.compareModal.addEventListener('click', e => { if(e.target === els.compareModal) els.compareModal.classList.remove('active'); });
+  els.compareModal.addEventListener('click', e => { if(e.target === els.compareModal) closeCompare(); });
 
   
 
@@ -1032,6 +1221,7 @@ els.recentStrip.addEventListener('click', function(e){
   });
 
   renderRecentStrip();
+  ensureActiveDeptOpen();
   renderTabs();
   renderContent();
 
@@ -1084,6 +1274,13 @@ window.addEventListener('hub-message', function(e){
       if(msg.category){
         var tb = els.tabs.querySelector('.tab-btn[data-tab="'+CSS.escape(msg.category)+'"]');
         if(tb) tb.click();
+      }
+      // The target tool may sit past the incrementally-rendered page -- reveal
+      // however many cards are needed to include it before trying to scroll.
+      var targetIndex = renderedTools.findIndex(function(t){ return t.id === msg.id; });
+      if(targetIndex > -1 && targetIndex >= visibleCount){
+        visibleCount = Math.ceil((targetIndex + 1) / CARD_PAGE_SIZE) * CARD_PAGE_SIZE;
+        renderContent();
       }
       requestAnimationFrame(function(){
         var el = els.content.querySelector('.tool-card[data-tool-id="'+CSS.escape(msg.id)+'"]');

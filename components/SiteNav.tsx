@@ -30,13 +30,13 @@ export default function SiteNav() {
   return (
     <nav className={`site-nav${scrolled ? " scrolled" : ""}`} aria-label="Main navigation">
       <div className="site-nav-inner">
-        <Link href="/" className="site-nav-brand" aria-label="ToolForge home">
+        <Link href="/" className="site-nav-brand" aria-label="ToolAtlas home">
           <span className="site-nav-logo" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
               <path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z" />
             </svg>
           </span>
-          ToolForge
+          ToolAtlas
         </Link>
 
         <div className={`site-nav-links${open ? " open" : ""}`} id="site-nav-links">
@@ -56,7 +56,7 @@ export default function SiteNav() {
         </div>
 
         <a
-          href="https://github.com/Surya8991/Master-Tools-Hub"
+          href="https://github.com/Surya8991/ToolAtlas"
           className="site-nav-icon-link"
           aria-label="GitHub repository"
           target="_blank"

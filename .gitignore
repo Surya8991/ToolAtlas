@@ -29,3 +29,6 @@ next-env.d.ts
 *.sln
 *.sw?
 .agentmaster/
+
+# Claude Code subagent worktrees (transient, never project content)
+.claude/worktrees/

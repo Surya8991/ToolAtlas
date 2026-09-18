@@ -107,7 +107,12 @@
     const toolsN = window.__TOOLS_DATA__ && Array.isArray(window.__TOOLS_DATA__.tools) ? window.__TOOLS_DATA__.tools.length : 0;
     const techN = Array.isArray(window.__TECH_DATA__) ? window.__TECH_DATA__.length : 0;
     const total = toolsN + techN;
-    if (total > 0) hubTotalMeta.textContent = total.toLocaleString() + ' items · Updated May 2026';
+    // Only overwrite once BOTH datasets are counted -- otherwise this briefly
+    // shows a partial total (e.g. tools-only) as if it were the grand total.
+    if (toolsN > 0 && techN > 0) {
+      const updated = hubTotalMeta.dataset.updated || '';
+      hubTotalMeta.textContent = total.toLocaleString() + ' items' + (updated ? ' · Updated ' + updated : '');
+    }
   }
 
   async function activate(section, push) {
@@ -154,7 +159,7 @@
 
     // Ask the active section to refresh its result-chip text
     window.dispatchEvent(new CustomEvent('hub-message', {detail: {type:'refreshChip'}}));
-    document.title = section === 'tech' ? 'Tech Stack - ToolForge' : 'AI Tools - ToolForge';
+    document.title = section === 'tech' ? 'Tech Stack | ToolAtlas' : 'AI Tools | ToolAtlas';
 
     if (push) {
       try { history.replaceState(null, '', '#' + section); } catch(e) {}
@@ -238,20 +243,20 @@
   document.addEventListener('keydown', e => {
     // Ctrl/Cmd+K — always focuses global search, even from inside input fields
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      if (hubSearchEl) { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchWrap.setAttribute('aria-expanded','true'); } hubSearchEl.focus(); hubSearchEl.select(); }
+      if (hubSearchEl) { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchEl.setAttribute('aria-expanded','true'); } hubSearchEl.focus(); hubSearchEl.select(); }
       return;
     }
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.key === '1') { e.preventDefault(); activate('tools', true); }
     if (e.key === '2') { e.preventDefault(); activate('tech',  true); }
-    if (e.key === '/') { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchWrap.setAttribute('aria-expanded','true'); } if (hubSearchEl) hubSearchEl.focus(); }
+    if (e.key === '/') { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchEl.setAttribute('aria-expanded','true'); } if (hubSearchEl) hubSearchEl.focus(); }
   });
 
   if (hubSearchTrigger && hubSearchWrap && hubSearchEl) {
     hubSearchTrigger.addEventListener('click', () => {
       hubSearchWrap.hidden = false;
-      hubSearchWrap.setAttribute('aria-expanded', 'true');
+      hubSearchEl.setAttribute('aria-expanded', 'true');
       requestAnimationFrame(() => { hubSearchEl.focus(); hubSearchEl.select(); });
     });
   }
@@ -260,13 +265,13 @@
     if (!hubSearchWrap || hubSearchWrap.hidden) return;
     if (hubSearchWrap.contains(e.target) || (hubSearchTrigger && hubSearchTrigger.contains(e.target))) return;
     hubSearchWrap.hidden = true;
-    hubSearchWrap.setAttribute('aria-expanded','false');
+    hubSearchEl.setAttribute('aria-expanded','false');
   });
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && hubSearchWrap && !hubSearchWrap.hidden && (!hubResultsEl || hubResultsEl.hidden)) {
       hubSearchWrap.hidden = true;
-      hubSearchWrap.setAttribute('aria-expanded','false');
+      hubSearchEl.setAttribute('aria-expanded','false');
       if (hubSearchTrigger) hubSearchTrigger.focus();
     }
   });
@@ -292,11 +297,17 @@
   // Preload tools + tech data so global search can show proper icons and
   // sub-lines even before the user opens either section.
   function preloadDataForSearch() {
-    if (!window.__TOOLS_DATA__) {
-      DataLoader.loadData('data/tools-data.js', '__TOOLS_DATA__').catch(() => {});
-    }
-    if (!window.__TECH_DATA__) {
-      DataLoader.loadData('data/tech-data.js', '__TECH_DATA__').catch(() => {});
+    const tasks = [];
+    if (!window.__TOOLS_DATA__) tasks.push(DataLoader.loadData('data/tools-data.js', '__TOOLS_DATA__').catch(() => {}));
+    if (!window.__TECH_DATA__) tasks.push(DataLoader.loadData('data/tech-data.js', '__TECH_DATA__').catch(() => {}));
+    // Once whichever dataset the active tab didn't already load resolves, refresh
+    // both nav counts and the combined total -- otherwise the header keeps showing
+    // only the first-loaded dataset's count even after the second one arrives.
+    if (tasks.length) {
+      Promise.all(tasks).then(() => {
+        updateCount('tools');
+        updateCount('tech');
+      });
     }
   }
   if ('requestIdleCallback' in window) {
@@ -336,7 +347,7 @@
   }
 
   function setSearchWrapExpanded(open) {
-    if (hubSearchWrap) hubSearchWrap.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (hubSearchEl) hubSearchEl.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
 
@@ -470,8 +481,11 @@
       ['tech','Tech', counts.tech||0],
       ['categories','Categories', counts.category||0]
     ];
-    return '<div class="hub-search-tabs" role="tablist" aria-label="Search result types">' + tabs.map(([id,label,count]) =>
-      '<button type="button" class="hub-search-tab ' + (active===id?'active':'') + '" data-search-tab="' + id + '" role="tab" aria-selected="' + (active===id?'true':'false') + '">' + label + ' <span>' + count + '</span></button>'
+    // A row of filter toggles over one shared results list, not a tablist
+    // owning separate tabpanels -- role="group" + aria-pressed is the
+    // correct pattern here (role="tab" with no matching tabpanel is invalid).
+    return '<div class="hub-search-tabs" role="group" aria-label="Filter search results by type">' + tabs.map(([id,label,count]) =>
+      '<button type="button" class="hub-search-tab ' + (active===id?'active':'') + '" data-search-tab="' + id + '" aria-pressed="' + (active===id?'true':'false') + '">' + label + ' <span>' + count + '</span></button>'
     ).join('') + '</div>';
   }
 
@@ -488,7 +502,7 @@
     const recents = getHubRecent();
     let html = renderSearchTabs(searchMode, {tools:0, tech:0, category:0});
     if (recents.length) {
-      html += '<div class="hub-results-section">';
+      html += '<div class="hub-results-section" role="group">';
       html += '<div class="hub-result-group"><span class="hub-result-group-icon">⌚</span> Recent searches <span class="hub-result-group-count">' + recents.length + '</span></div>';
       recents.forEach(r => {
         html += '<div class="hub-result" role="option" data-recent="1" data-q="' + esc(r.q) + '"' +
@@ -499,7 +513,7 @@
       });
       html += '</div>';
     }
-    html += '<div class="hub-results-section">';
+    html += '<div class="hub-results-section" role="group">';
     html += '<div class="hub-result-group"><span class="hub-result-group-icon">✨</span> Try searching for</div>';
     html += '<div class="hub-suggest-row">' + SUGGESTED.map(s => '<button type="button" class="hub-suggest-pill" data-suggest="' + esc(s) + '">' + esc(s) + '</button>').join('') + '</div>';
     html += '</div>';
@@ -577,7 +591,7 @@
       ].forEach(([sec, label, icon]) => {
         const grp = bySection[sec];
         if (!grp.length) return;
-        html += '<div class="hub-results-section">';
+        html += '<div class="hub-results-section" role="group">';
         html += '<div class="hub-result-group"><span class="hub-result-group-icon">' + icon + '</span>' + label + '<span class="hub-result-group-count">' + grp.length + '</span></div>';
         grp.forEach(h => {
           let sub = '';
@@ -787,6 +801,55 @@
       if (e.key === 'Escape') { helpPop.setAttribute('hidden',''); helpBtn.setAttribute('aria-expanded','false'); }
     });
   }
+
+  // Sidebar-as-drawer (mobile only -- CSS keeps the toggle/backdrop
+  // display:none above the 980px breakpoint, where the sidebar stays sticky
+  // inline exactly as before). Each section gets its own toggle/panel/
+  // backdrop/close quartet; only one is ever visible since tools-section and
+  // tech-section are mutually exclusive.
+  ['tools', 'tech'].forEach(function(prefix){
+    const toggle = document.getElementById(prefix + '-sidebarToggle');
+    const panel = document.getElementById(prefix + '-sidebarPanel');
+    const backdrop = document.getElementById(prefix + '-sidebarBackdrop');
+    const closeBtn = document.getElementById(prefix + '-sidebarClose');
+    if (!toggle || !panel) return;
+
+    function openDrawer(){
+      panel.classList.add('open');
+      if (backdrop) backdrop.removeAttribute('hidden');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('sidebar-drawer-open');
+    }
+    function closeDrawer(){
+      panel.classList.remove('open');
+      if (backdrop) backdrop.setAttribute('hidden', '');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('sidebar-drawer-open');
+    }
+
+    toggle.addEventListener('click', () => {
+      panel.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && panel.classList.contains('open')) closeDrawer();
+    });
+
+    // Picking an actual category should return the user to the results
+    // instead of leaving the drawer sitting open over them -- but picking a
+    // department row (.tab-btn-dept) only opens its own dropdown of
+    // children, it isn't a finished choice yet, so that case is excluded.
+    // tools.js/tech.js's own category-click handlers are delegated on the
+    // stable #<prefix>-tabs container and already fire (and re-render it)
+    // before this listener sees the bubbling click, but closest() still
+    // resolves correctly on a detached target -- same reasoning as the
+    // composedPath() fix for the dropdown's outside-click handler.
+    panel.addEventListener('click', e => {
+      const btn = e.target.closest('.tab-btn');
+      if (btn && !btn.classList.contains('tab-btn-dept')) closeDrawer();
+    });
+  });
 
   let saved = '';
   try { saved = localStorage.getItem('hubSection') || ''; } catch(e) {}
