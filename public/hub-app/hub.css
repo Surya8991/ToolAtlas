@@ -229,9 +229,16 @@ body { margin: 0; padding: 0; background: #fafafa; font-family: 'Inter', system-
   .hub-result-chip { max-width: 140px; }
 }
 @media (max-width: 640px) {
-  .hub-brand-text { display: none; }
+  /* .hub-brand-text and .hub-nav-label used to be hidden here too. Later
+     navbar passes (search below, "Polished product navbar", "Final navbar
+     layout fix") deliberately manage both at their own breakpoints --
+     .hub-brand-text stays visible down to 560px, .hub-nav-label stays
+     visible always (explicitly restored at <=560px) -- but never touched
+     this older rule, leaving a live 561-640px gap where the logo wordmark
+     and both nav-tab labels vanished, showing only an icon and a bare
+     count with no accessible name. Removed rather than patched, matching
+     how the --sticky-top duplicate-:root conflict was resolved earlier. */
   .hub-result-chip { display: none; }
-  .hub-nav-label { display: none; }
   .hub-nav-btn { padding: 6px 10px; }
 }
 
