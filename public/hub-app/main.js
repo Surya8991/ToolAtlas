@@ -243,20 +243,20 @@
   document.addEventListener('keydown', e => {
     // Ctrl/Cmd+K — always focuses global search, even from inside input fields
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      if (hubSearchEl) { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchWrap.setAttribute('aria-expanded','true'); } hubSearchEl.focus(); hubSearchEl.select(); }
+      if (hubSearchEl) { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchEl.setAttribute('aria-expanded','true'); } hubSearchEl.focus(); hubSearchEl.select(); }
       return;
     }
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.key === '1') { e.preventDefault(); activate('tools', true); }
     if (e.key === '2') { e.preventDefault(); activate('tech',  true); }
-    if (e.key === '/') { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchWrap.setAttribute('aria-expanded','true'); } if (hubSearchEl) hubSearchEl.focus(); }
+    if (e.key === '/') { e.preventDefault(); if (hubSearchWrap) { hubSearchWrap.hidden = false; hubSearchEl.setAttribute('aria-expanded','true'); } if (hubSearchEl) hubSearchEl.focus(); }
   });
 
   if (hubSearchTrigger && hubSearchWrap && hubSearchEl) {
     hubSearchTrigger.addEventListener('click', () => {
       hubSearchWrap.hidden = false;
-      hubSearchWrap.setAttribute('aria-expanded', 'true');
+      hubSearchEl.setAttribute('aria-expanded', 'true');
       requestAnimationFrame(() => { hubSearchEl.focus(); hubSearchEl.select(); });
     });
   }
@@ -265,13 +265,13 @@
     if (!hubSearchWrap || hubSearchWrap.hidden) return;
     if (hubSearchWrap.contains(e.target) || (hubSearchTrigger && hubSearchTrigger.contains(e.target))) return;
     hubSearchWrap.hidden = true;
-    hubSearchWrap.setAttribute('aria-expanded','false');
+    hubSearchEl.setAttribute('aria-expanded','false');
   });
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && hubSearchWrap && !hubSearchWrap.hidden && (!hubResultsEl || hubResultsEl.hidden)) {
       hubSearchWrap.hidden = true;
-      hubSearchWrap.setAttribute('aria-expanded','false');
+      hubSearchEl.setAttribute('aria-expanded','false');
       if (hubSearchTrigger) hubSearchTrigger.focus();
     }
   });
@@ -347,7 +347,7 @@
   }
 
   function setSearchWrapExpanded(open) {
-    if (hubSearchWrap) hubSearchWrap.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (hubSearchEl) hubSearchEl.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
 
@@ -481,8 +481,11 @@
       ['tech','Tech', counts.tech||0],
       ['categories','Categories', counts.category||0]
     ];
-    return '<div class="hub-search-tabs" role="tablist" aria-label="Search result types">' + tabs.map(([id,label,count]) =>
-      '<button type="button" class="hub-search-tab ' + (active===id?'active':'') + '" data-search-tab="' + id + '" role="tab" aria-selected="' + (active===id?'true':'false') + '">' + label + ' <span>' + count + '</span></button>'
+    // A row of filter toggles over one shared results list, not a tablist
+    // owning separate tabpanels -- role="group" + aria-pressed is the
+    // correct pattern here (role="tab" with no matching tabpanel is invalid).
+    return '<div class="hub-search-tabs" role="group" aria-label="Filter search results by type">' + tabs.map(([id,label,count]) =>
+      '<button type="button" class="hub-search-tab ' + (active===id?'active':'') + '" data-search-tab="' + id + '" aria-pressed="' + (active===id?'true':'false') + '">' + label + ' <span>' + count + '</span></button>'
     ).join('') + '</div>';
   }
 
@@ -499,7 +502,7 @@
     const recents = getHubRecent();
     let html = renderSearchTabs(searchMode, {tools:0, tech:0, category:0});
     if (recents.length) {
-      html += '<div class="hub-results-section">';
+      html += '<div class="hub-results-section" role="group">';
       html += '<div class="hub-result-group"><span class="hub-result-group-icon">⌚</span> Recent searches <span class="hub-result-group-count">' + recents.length + '</span></div>';
       recents.forEach(r => {
         html += '<div class="hub-result" role="option" data-recent="1" data-q="' + esc(r.q) + '"' +
@@ -510,7 +513,7 @@
       });
       html += '</div>';
     }
-    html += '<div class="hub-results-section">';
+    html += '<div class="hub-results-section" role="group">';
     html += '<div class="hub-result-group"><span class="hub-result-group-icon">✨</span> Try searching for</div>';
     html += '<div class="hub-suggest-row">' + SUGGESTED.map(s => '<button type="button" class="hub-suggest-pill" data-suggest="' + esc(s) + '">' + esc(s) + '</button>').join('') + '</div>';
     html += '</div>';
@@ -588,7 +591,7 @@
       ].forEach(([sec, label, icon]) => {
         const grp = bySection[sec];
         if (!grp.length) return;
-        html += '<div class="hub-results-section">';
+        html += '<div class="hub-results-section" role="group">';
         html += '<div class="hub-result-group"><span class="hub-result-group-icon">' + icon + '</span>' + label + '<span class="hub-result-group-count">' + grp.length + '</span></div>';
         grp.forEach(h => {
           let sub = '';

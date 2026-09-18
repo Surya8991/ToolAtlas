@@ -252,7 +252,7 @@ body { margin: 0; padding: 0; background: #fafafa; font-family: 'Inter', system-
 .hub-meta{justify-self:end;gap:8px}.hub-total-meta{color:#a5b4fc;font-size:11.5px;font-weight:800;white-space:nowrap}.hub-help{width:34px;height:34px;border-radius:12px}.hub-help kbd{font-size:12px;font-weight:900}.hub-search[hidden]{display:none}.hub-search:not([hidden]){position:absolute;left:50%;top:calc(100% + 10px);transform:translateX(-50%);z-index:200;width:min(720px,calc(100vw - 32px));max-width:none;min-width:0;margin:0;filter:drop-shadow(0 22px 48px rgba(15,23,42,.28))}.hub-search:not([hidden]) input{height:52px;border-radius:18px;background:#fff;color:#111827;border:1px solid #c7d2fe;box-shadow:0 0 0 4px rgba(99,102,241,.13);font-size:15px;padding-left:46px;padding-right:62px}.hub-search:not([hidden]) input::placeholder{color:#64748b}.hub-search:not([hidden]) .hub-search-icon{left:17px;color:#64748b;width:17px;height:17px}.hub-search:not([hidden]) .hub-search-hint kbd{background:#f8fafc;color:#64748b;border-color:#e2e8f0}.hub-search:not([hidden]) .hub-search-clear{right:17px;background:#f1f5f9;color:#64748b}.hub-results{top:calc(100% + 8px)}
 .hub-main{height:calc(100vh - 72px)}
 @media(max-width:980px){.hub-header{height:auto;min-height:0;padding:10px 12px}.hub-topline{grid-template-columns:1fr auto;gap:10px}.hub-brand-subtext,.hub-total-meta{display:none}.hub-nav{grid-column:1 / -1;justify-self:stretch;display:grid;grid-template-columns:1fr 1fr}.hub-nav-btn{justify-content:center}.hub-search-trigger{grid-column:2;grid-row:1}.hub-meta{display:none}.hub-main{height:calc(100vh - 108px)}}
-@media(max-width:560px){.hub-brand-text{font-size:14px}.hub-brand-mark{width:30px;height:30px}.hub-search-trigger span:not(.hub-search-trigger-kbd){display:none}.hub-search-trigger-kbd{display:none}.hub-search-trigger{width:38px;justify-content:center;padding:0}.hub-nav-label{display:inline}.hub-nav-count{font-size:10px;padding:1px 6px}.hub-nav-btn{padding:7px 8px;gap:6px}}
+@media(max-width:560px){.hub-brand-text{font-size:14px}.hub-brand-mark{width:30px;height:30px}.hub-search-trigger span:not(.hub-search-trigger-kbd){display:none}.hub-search-trigger-kbd{display:none}.hub-search-trigger{width:44px;min-height:44px;justify-content:center;padding:0}.hub-nav-label{display:inline}.hub-nav-count{font-size:10px;padding:1px 6px}.hub-nav-btn{padding:7px 8px;gap:6px}}
 
 /* ============ Final navbar layout fix ============
    Keeps all nav controls on one row on desktop so metadata never wraps below
@@ -352,31 +352,21 @@ html,body{margin:0;padding:0;height:100%;background:#0f172a;font-family:Inter,-a
 
 /* TECH CSS */
 
+/* Token definitions live in the single :root block in the TOOLS CSS
+   section below -- this section used to redeclare the same tokens with
+   --sticky-top:140px, which every :root selector shares equal
+   specificity with, so the later declaration (168px, the "TOOLS CSS"
+   one) silently won everywhere, including here. That left every rule in
+   this section authored against a value 28px off from what actually
+   applied. Removing the duplicate instead of "fixing" it keeps there
+   from being two numbers to keep in sync again. */
 *,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f3f6fb;
-  --surface:#ffffff;
-  --surface-2:#f8fafc;
-  --border:#d8e0ec;
-  --border-strong:#cbd5e1;
-  --text:#111827;
-  --heading:#0f172a;
-  --muted:#475569;
-  --subtle:#64748b;
-  --accent:#2563eb;
-  --accent-hover:#1d4ed8;
-  --accent-soft:#eff6ff;
-  --accent-border:#bfdbfe;
-  --shadow:0 10px 28px rgba(15,23,42,.07);
-  --sticky-top:140px;
-}
 html{scroll-padding-top:var(--sticky-top)}
 html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5;font-size:15px}
 body{text-rendering:optimizeLegibility;background:radial-gradient(circle at 10% -10%,rgba(37,99,235,.10),transparent 28%),radial-gradient(circle at 92% 4%,rgba(79,70,229,.08),transparent 30%),linear-gradient(180deg,#f8fbff 0%,#f3f6fb 42%,#eef3fa 100%)}
 button,input,select{font:inherit}
 button{cursor:pointer}
 a{color:inherit}
-:focus-visible{outline:3px solid rgba(37,99,235,.35);outline-offset:3px}
 .hidden{display:none!important}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -534,7 +524,10 @@ body{
 button,input,select{font:inherit}
 button{cursor:pointer}
 a{color:inherit}
-:focus-visible{outline:3px solid rgba(37,99,235,.35);outline-offset:3px}
+/* Opaque outline: the previous 35%-alpha blue composited to ~1.67:1 over
+   white, failing WCAG 1.4.11's 3:1 minimum for UI-component contrast --
+   #1d4ed8 (already --accent-hover elsewhere) measures ~6.7:1. */
+:focus-visible{outline:3px solid #1d4ed8;outline-offset:3px}
 .hidden{display:none!important}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .skip-link{position:fixed;left:16px;top:12px;z-index:10000;transform:translateY(-160%);background:#0f172a;color:white;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:800;box-shadow:var(--shadow);transition:transform .15s ease}
@@ -872,7 +865,8 @@ kbd{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:8px;
   .tool-favicon{width:24px;height:24px}
   .tool-title-row{gap:9px}
   .tool-name{font-size:15px}
-  .favorite-btn{min-height:34px}
+  .favorite-btn{min-height:44px;min-width:44px}
+  .density-btn{min-height:44px;min-width:44px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}

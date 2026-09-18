@@ -57,9 +57,9 @@ export function buildHubMarkup(stats: CatalogStats): string {
       </div>
     </div>
 
-    <div class="hub-search" role="combobox" aria-haspopup="listbox" aria-owns="hub-global-search-results" aria-expanded="false" hidden>
+    <div class="hub-search" hidden>
       <svg class="hub-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <input type="text" id="hub-global-search" placeholder="Search tools, tech, categories, packages, frameworks, APIs…" autocomplete="off" spellcheck="false" aria-label="Global command search across tools and tech" aria-keyshortcuts="/ Control+K" aria-autocomplete="list" aria-controls="hub-global-search-results">
+      <input type="text" id="hub-global-search" role="combobox" aria-haspopup="listbox" aria-expanded="false" placeholder="Search tools, tech, categories, packages, frameworks, APIs…" autocomplete="off" spellcheck="false" aria-label="Global command search across tools and tech" aria-keyshortcuts="/ Control+K" aria-autocomplete="list" aria-controls="hub-global-search-results">
       <button type="button" class="hub-search-clear" id="hub-global-search-clear" aria-label="Clear search" hidden>&times;</button>
       <span class="hub-search-hint" aria-hidden="true"><kbd>Esc</kbd></span>
       <div id="hub-global-search-results" class="hub-results" role="listbox" aria-label="Search results" hidden></div>
@@ -116,10 +116,10 @@ export function buildHubMarkup(stats: CatalogStats): string {
   <button class="compare-clear" id="tools-compareClear">Clear</button>
 </div>
 
-<div class="modal-backdrop" id="tools-compareModal">
+<div class="modal-backdrop" id="tools-compareModal" role="dialog" aria-modal="true" aria-labelledby="tools-compareModalTitle">
   <div class="modal">
     <div class="modal-head">
-      <h2>Tool Comparison</h2>
+      <h2 id="tools-compareModalTitle">Tool Comparison</h2>
       <button class="modal-close" id="tools-modalClose">Close</button>
     </div>
     <div id="tools-compareModalContent"></div>
@@ -161,6 +161,7 @@ export function buildHubMarkup(stats: CatalogStats): string {
     </section>
 
     <section id="tech-section" class="hub-section sec-tech" role="tabpanel" aria-labelledby="hub-tab-tech" hidden>
+<a class="skip-link" href="#tech-main">Skip to tech stack</a>
 <div class="page-shell">
   <aside class="category-sidebar" aria-label="Categories">
     <div class="sidebar-title">Categories</div>

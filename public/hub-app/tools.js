@@ -93,6 +93,7 @@ window.initTools = async function() {
   let searchQuery = '';
   let selectedCompare = new Set();
   let lastToolFocus = null;
+  let lastCompareFocus = null;
   let currentDensity = 'default';
   try { currentDensity = localStorage.getItem(DENSITY_KEY) || 'default'; } catch(e) {}
 
@@ -304,10 +305,6 @@ window.initTools = async function() {
               <option value="editor" ${sortMode==='editor'?'selected':''}>Editor's choice first</option>
               <option value="developer" ${sortMode==='developer'?'selected':''}>Developer picks first</option>
               <option value="popular" ${sortMode==='popular'?'selected':''}>Popular</option>
-              <option value="free" ${sortMode==='free'?'selected':''}>Free first</option>
-              <option value="open_source" ${sortMode==='open_source'?'selected':''}>Open source first</option>
-              <option value="website" ${sortMode==='website'?'selected':''}>Websites only</option>
-              <option value="tool" ${sortMode==='tool'?'selected':''}>Tools only</option>
               <option value="verified" ${sortMode==='verified'?'selected':''}>Recently verified</option>
               <option value="az" ${sortMode==='az'?'selected':''}>A-Z</option>
             </select>
@@ -666,7 +663,18 @@ window.initTools = async function() {
         </tbody>
       </table>
     `;
+    lastCompareFocus = document.activeElement;
     els.compareModal.classList.add('active');
+    if(els.modalClose) els.modalClose.focus();
+  }
+
+  function closeCompare(){
+    if(!els.compareModal.classList.contains('active')) return;
+    els.compareModal.classList.remove('active');
+    if(lastCompareFocus && typeof lastCompareFocus.focus === 'function' && document.contains(lastCompareFocus)){
+      try{ lastCompareFocus.focus({preventScroll:true}); }catch(e){ try{ lastCompareFocus.focus(); }catch(_){} }
+    }
+    lastCompareFocus = null;
   }
 
 
@@ -1024,6 +1032,11 @@ window.initTools = async function() {
     renderTabs();
     renderContent();
     scrollSectionTop();
+    // Keep the URL in sync with the selected category -- previously the
+    // hash only reflected whatever category the page loaded with, so
+    // clicking around left the address bar pointing at a stale view and
+    // Back exited the hub entirely instead of undoing a category change.
+    try{ history.replaceState(null, '', location.pathname + location.search + '#tools/' + activeTab); }catch(e){}
   });
 
   if(els.categorySearch){
@@ -1050,7 +1063,7 @@ window.initTools = async function() {
       if (navSearch) { e.preventDefault(); navSearch.focus(); navSearch.select(); }
     }
     if(e.key === 'Escape') {
-      els.compareModal.classList.remove('active');
+      closeCompare();
       closeToolDetail();
     }
   });
@@ -1061,10 +1074,10 @@ window.initTools = async function() {
     updateCompareBar();
     renderContent();
   });
-  els.modalClose.addEventListener('click', () => els.compareModal.classList.remove('active'));
+  els.modalClose.addEventListener('click', closeCompare);
   els.tdClose.addEventListener('click', closeToolDetail);
   els.toolDetailModal.addEventListener('click', e => { if(e.target === els.toolDetailModal) closeToolDetail(); });
-  els.compareModal.addEventListener('click', e => { if(e.target === els.compareModal) els.compareModal.classList.remove('active'); });
+  els.compareModal.addEventListener('click', e => { if(e.target === els.compareModal) closeCompare(); });
 
   
 

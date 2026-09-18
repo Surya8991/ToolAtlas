@@ -31,6 +31,11 @@
 
   --grad: linear-gradient(120deg, #a78bfa 0%, #6366f1 35%, #3b82f6 65%, #22d3ee 100%);
   --grad-soft: linear-gradient(135deg, rgba(139,92,246,.18), rgba(34,211,238,.14));
+  /* Same stops as --grad but stopped short of the cyan end: white text over
+     that end of --grad measures ~1.8:1, failing WCAG AA (4.5:1) on every
+     primary button. Both stops here individually clear 4.5:1 against white
+     (~6.3:1 and ~5.2:1), so the animated cycle stays legible throughout. */
+  --grad-cta: linear-gradient(120deg, #4f46e5 0%, #2563eb 100%);
 
   --font: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   --maxw: 1200px;
@@ -53,6 +58,12 @@ body {
 img { max-width: 100%; display: block; }
 a { color: inherit; }
 ::selection { background: rgba(139,92,246,.35); color: #fff; }
+
+/* This surface had no explicit focus style at all -- nav links, buttons,
+   and cards relied entirely on the browser's default outline over a
+   near-black canvas. --accent (#a78bfa) measures ~7.6:1 against --bg-0,
+   comfortably past WCAG 1.4.11's 3:1 minimum for focus indicators. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 
 /* Global animated backdrop — subtle drifting aurora behind everything */
 body::before {
@@ -185,7 +196,7 @@ body.hub-active::before, body.hub-active::after { display: none; }
   position: relative; overflow: hidden;
   display: inline-flex; align-items: center; gap: 6px;
   padding: 9px 20px; border-radius: 11px;
-  background: var(--grad); background-size: 200% 200%;
+  background: var(--grad-cta); background-size: 200% 200%;
   color: #fff; font-weight: 750; font-size: 13.5px; letter-spacing: -.01em;
   text-decoration: none; white-space: nowrap; flex-shrink: 0; margin-left: 10px;
   box-shadow: 0 8px 22px -6px rgba(99,102,241,.6);
@@ -293,7 +304,7 @@ body.hub-active::before, body.hub-active::after { display: none; }
   position: relative; overflow: hidden;
   display: inline-flex; align-items: center; gap: 8px;
   padding: 15px 30px; border-radius: 13px;
-  background: var(--grad); background-size: 200% 200%;
+  background: var(--grad-cta); background-size: 200% 200%;
   color: #fff; font-weight: 750; font-size: 15px; letter-spacing: -.01em;
   text-decoration: none; border: none; cursor: pointer;
   box-shadow: 0 12px 30px -8px rgba(99,102,241,.6), inset 0 1px 0 rgba(255,255,255,.25);
@@ -646,7 +657,7 @@ body.hub-active::before, body.hub-active::after { display: none; }
 .form-field select option { background: var(--bg-2); color: var(--text-0); }
 .form-submit {
   position: relative; overflow: hidden; width: 100%; padding: 15px;
-  background: var(--grad); background-size: 200% 200%; color: #fff;
+  background: var(--grad-cta); background-size: 200% 200%; color: #fff;
   font-family: var(--font); font-size: 15px; font-weight: 750;
   border: none; border-radius: 13px; cursor: pointer;
   box-shadow: 0 12px 28px -8px rgba(99,102,241,.55);
