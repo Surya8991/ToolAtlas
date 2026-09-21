@@ -1,16 +1,16 @@
-# ⚡ ToolForge
+# ⚡ ToolAtlas
 
-A premium developer catalog featuring **2,386 AI Tools** and **1,861 Developer Technologies**, built on **Next.js 15 (App Router) + React 19 + TypeScript**. A polished marketing site (Home / About / Contact) wraps the full-featured catalog hub.
+A hand-checked developer catalog featuring **2,324 AI Tools** and **1,850 Developer Technologies** across 55 categories, built on **Next.js 15 (App Router) + React 19 + TypeScript**. A "Field Atlas" cartography-themed marketing site (Home / About / Contact) wraps the full-featured catalog hub. Every count on the site is computed live from the data files — never hardcoded.
 
 ## 📁 Repository Structure
 ```
-toolforge/
+toolatlas/
 ├── app/                            # Next.js App Router
-│   ├── layout.tsx                  # Root layout (Inter font, metadata)
-│   ├── globals.css                 # World-class dark design system
-│   ├── page.tsx                    # Home (hero, product preview, features, CTA)
+│   ├── layout.tsx                  # Root layout (Space Grotesk + Fraunces, metadata)
+│   ├── globals.css                 # "Field Atlas" dark design system (marketing register)
+│   ├── page.tsx                    # Home (hero, product preview, category legend panels, features, CTA)
 │   ├── about/page.tsx              # About / story / principles
-│   ├── contact/page.tsx            # Contact form + FAQ
+│   ├── contact/page.tsx            # Contact methods + form + FAQ
 │   └── hub/                        # The catalog hub
 │       ├── layout.tsx              # Hub metadata
 │       └── page.tsx                # Client component: injects markup + boots controllers
@@ -18,16 +18,22 @@ toolforge/
 │   ├── SiteNav.tsx · SiteFooter.tsx
 │   ├── Effects.tsx                 # Scroll-reveal, count-up, cursor spotlight
 │   ├── ContactForm.tsx · Faq.tsx
+│   ├── HubClient.tsx               # Mounts/tears down the hub's vanilla-JS controllers
+│   └── icons.tsx                   # Shared authored SVG line-icon set (no emoji, no icon lib)
 ├── lib/
-│   └── hubMarkup.ts                # Hub DOM markup (the catalog shell)
+│   ├── hubMarkup.ts                # Hub DOM markup (the catalog shell)
+│   └── catalogStats.ts             # Single source of truth for every count shown on the site
 ├── public/
-│   ├── data/                       # Lazy-loaded datasets (tools, tech, search index)
-│   ├── hub-app/                    # Hub engine served as static assets
+│   ├── data/                       # Source-of-truth datasets (tools, tech, search index)
+│   ├── hub-app/                    # Hub engine served as static assets (light "pages" register)
 │   │   ├── hub.css                 # Hub styles (shell + cards + drawers)
 │   │   ├── dataLoader.js · tools.js · tech.js · main.js
 │   ├── favicon.svg · icons.svg
+├── docs/
+│   ├── REDESIGN_PLAN.md            # UI/UX redesign history, decisions, and rationale
+│   └── CATALOG_REORG_PLAN.md       # Taxonomy reorg design (executed)
 ├── next.config.mjs · tsconfig.json · types.d.ts
-└── agents.md                       # Layout constraints and visual gotchas
+└── agents.md                       # Architecture, constraints, and known gotchas for agents
 ```
 
 > The hub catalog logic is the original, battle-tested vanilla-JS engine. The `/hub` route mounts it inside a React client component (injecting the markup and booting the controllers on mount, cleaning up on unmount). Its internals can be incrementally rewritten into pure React over time.
@@ -35,8 +41,8 @@ toolforge/
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/Surya8991/Master-Tools-Hub.git
-cd Master-Tools-Hub
+git clone https://github.com/Surya8991/ToolAtlas.git
+cd ToolAtlas
 npm install
 npm run dev      # http://localhost:3000
 ```

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://toolforge.dev/sitemap.xml
+Sitemap: https://toolatlas.dev/sitemap.xml

@@ -1,13 +1,22 @@
 // AUTO-GENERATED from hub.html: the proven hub markup, injected by app/hub/page.tsx.
 // Controllers query these element IDs at runtime; do not rename IDs.
-export const HUB_MARKUP = `<header class="hub-header">
+//
+// This is a FUNCTION, not a static string: every count shown here comes from
+// the real catalog data (see lib/catalogStats.ts) so the server-rendered
+// first paint already matches what the client runtime computes a moment
+// later. Never hardcode a total/count literal in this file again.
+import type { CatalogStats } from "./catalogStats";
+
+export function buildHubMarkup(stats: CatalogStats): string {
+  const totalItems = stats.totalTools + stats.totalTech;
+  return `<header class="hub-header">
     <div class="hub-topline">
-      <a class="hub-brand" href="/" aria-label="Back to ToolForge home">
+      <a class="hub-brand" href="/" aria-label="Back to ToolAtlas home">
         <span class="hub-brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/></svg>
         </span>
         <div class="hub-brand-copy">
-          <span class="hub-brand-text">ToolForge</span>
+          <span class="hub-brand-text">ToolAtlas</span>
           <span class="hub-brand-subtext">AI tools + developer technologies</span>
         </div>
       </a>
@@ -16,12 +25,12 @@ export const HUB_MARKUP = `<header class="hub-header">
         <button class="hub-nav-btn active" data-target="tools" type="button" role="tab" id="hub-tab-tools" aria-selected="true" aria-controls="tools-section" tabindex="0">
           <span class="hub-nav-icon" aria-hidden="true">🤖</span>
           <span class="hub-nav-label">AI Tools</span>
-          <span class="hub-nav-count" id="hub-count-tools" aria-label="2386 AI tools">2,386</span>
+          <span class="hub-nav-count" id="hub-count-tools">${stats.totalTools.toLocaleString()}</span>
         </button>
         <button class="hub-nav-btn" data-target="tech" type="button" role="tab" id="hub-tab-tech" aria-selected="false" aria-controls="tech-section" tabindex="-1">
           <span class="hub-nav-icon" aria-hidden="true">🛠</span>
           <span class="hub-nav-label">Tech Stack</span>
-          <span class="hub-nav-count" id="hub-count-tech" aria-label="1861 tech items">1,861</span>
+          <span class="hub-nav-count" id="hub-count-tech">${stats.totalTech.toLocaleString()}</span>
         </button>
       </nav>
 
@@ -33,7 +42,7 @@ export const HUB_MARKUP = `<header class="hub-header">
 
       <div class="hub-meta">
         <a href="/" class="hub-home-link" aria-label="Home">← Home</a>
-        <span class="hub-total-meta" id="hub-total-meta">4,247 items · Updated May 2026</span>
+        <span class="hub-total-meta" id="hub-total-meta" data-updated="${stats.lastUpdatedLabel}">${totalItems.toLocaleString()} items · Updated ${stats.lastUpdatedLabel}</span>
         <span class="hub-result-chip" id="hub-result-chip" hidden></span>
         <button type="button" class="hub-help" id="hub-help-btn" aria-label="Keyboard shortcuts" aria-expanded="false" aria-controls="hub-help-popover">
           <kbd>?</kbd>
@@ -48,9 +57,9 @@ export const HUB_MARKUP = `<header class="hub-header">
       </div>
     </div>
 
-    <div class="hub-search" role="combobox" aria-haspopup="listbox" aria-owns="hub-global-search-results" aria-expanded="false" hidden>
+    <div class="hub-search" hidden>
       <svg class="hub-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <input type="text" id="hub-global-search" placeholder="Search tools, tech, categories, packages, frameworks, APIs…" autocomplete="off" spellcheck="false" aria-label="Global command search across tools and tech" aria-keyshortcuts="/ Control+K" aria-autocomplete="list" aria-controls="hub-global-search-results">
+      <input type="text" id="hub-global-search" role="combobox" aria-haspopup="listbox" aria-expanded="false" placeholder="Search tools, tech, categories, packages, frameworks, APIs…" autocomplete="off" spellcheck="false" aria-label="Global command search across tools and tech" aria-keyshortcuts="/ Control+K" aria-autocomplete="list" aria-controls="hub-global-search-results">
       <button type="button" class="hub-search-clear" id="hub-global-search-clear" aria-label="Clear search" hidden>&times;</button>
       <span class="hub-search-hint" aria-hidden="true"><kbd>Esc</kbd></span>
       <div id="hub-global-search-results" class="hub-results" role="listbox" aria-label="Search results" hidden></div>
@@ -68,7 +77,10 @@ export const HUB_MARKUP = `<header class="hub-header">
 
 <div id="tools-recentStrip" class="recent-strip hidden" aria-label="Recently viewed tools"></div>
 <div class="page-shell">
-  <aside class="category-sidebar" aria-label="Categories and filters">
+  <aside class="category-sidebar" id="tools-sidebarPanel" aria-label="Categories and filters">
+    <button type="button" class="sidebar-close" id="tools-sidebarClose" aria-label="Close categories">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
     <div class="sidebar-title">Categories</div>
     <div class="category-tools" aria-label="Category tools">
       <label class="field" for="tools-categorySearch">
@@ -81,8 +93,8 @@ export const HUB_MARKUP = `<header class="hub-header">
       <div class="utility-actions">
         <button class="action-btn" id="tools-resetFilters" type="button">All categories</button>
         <button class="action-btn" id="tools-clearSaved" type="button">Clear saved</button>
-        <button class="action-btn" id="tools-exportSaved" type="button">⬇ Export saved</button>
-        <button class="action-btn" id="tools-exportCsv" type="button">⬇ Export CSV</button>
+        <button class="action-btn action-btn-export" id="tools-exportSaved" type="button">⬇ Export saved</button>
+        <button class="action-btn action-btn-export" id="tools-exportCsv" type="button">⬇ Export CSV</button>
       </div>
       <div class="field">
         <span class="field-label">Density</span>
@@ -95,8 +107,13 @@ export const HUB_MARKUP = `<header class="hub-header">
     </div>
     <nav class="tabs" id="tools-tabs" aria-label="Tool categories" role="tablist"></nav>
   </aside>
+  <div class="sidebar-backdrop" id="tools-sidebarBackdrop" hidden></div>
 
   <section data-embedded-main="tools" id="tools-main">
+    <button type="button" class="sidebar-toggle" id="tools-sidebarToggle" aria-expanded="false" aria-controls="tools-sidebarPanel">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+      <span>Categories &amp; filters</span>
+    </button>
     <div id="tools-content"></div>
   </section>
 </div>
@@ -107,10 +124,10 @@ export const HUB_MARKUP = `<header class="hub-header">
   <button class="compare-clear" id="tools-compareClear">Clear</button>
 </div>
 
-<div class="modal-backdrop" id="tools-compareModal">
+<div class="modal-backdrop" id="tools-compareModal" role="dialog" aria-modal="true" aria-labelledby="tools-compareModalTitle">
   <div class="modal">
     <div class="modal-head">
-      <h2>Tool Comparison</h2>
+      <h2 id="tools-compareModalTitle">Tool Comparison</h2>
       <button class="modal-close" id="tools-modalClose">Close</button>
     </div>
     <div id="tools-compareModalContent"></div>
@@ -121,7 +138,7 @@ export const HUB_MARKUP = `<header class="hub-header">
   <div class="tool-detail-panel">
     <div class="td-head">
       <div class="td-identity">
-        <img class="td-favicon-lg" id="tools-tdFavicon" width="44" height="44" src="" alt="">
+        <img class="td-favicon-lg" id="tools-tdFavicon" width="44" height="44" alt="">
         <div class="td-name-block">
           <h2 class="td-title" id="tools-tdName"></h2>
           <a class="td-url-link" id="tools-tdUrlLink" href="#" target="_blank" rel="noopener"></a>
@@ -136,14 +153,14 @@ export const HUB_MARKUP = `<header class="hub-header">
 <footer class="directory-footer" aria-label="AI tools directory footer">
   <div class="directory-footer-inner">
     <div class="directory-footer-brand">
-      <strong>ToolForge</strong>
-      <span id="tools-footer-summary">2,386 AI tools across curated categories.</span>
+      <strong>ToolAtlas</strong>
+      <span id="tools-footer-summary">${stats.totalTools.toLocaleString()} AI tools across curated categories.</span>
     </div>
     <div class="directory-footer-actions">
       <button type="button" class="footer-action" data-footer-action="search">Search all</button>
       <button type="button" class="footer-action" data-footer-action="top">Back to top</button>
       <a href="/" class="footer-action" style="text-decoration:none">← Home</a>
-      <span class="footer-meta">Updated May 2026</span>
+      <span class="footer-meta">Updated ${stats.lastUpdatedLabel}</span>
     </div>
   </div>
 </footer>
@@ -152,8 +169,12 @@ export const HUB_MARKUP = `<header class="hub-header">
     </section>
 
     <section id="tech-section" class="hub-section sec-tech" role="tabpanel" aria-labelledby="hub-tab-tech" hidden>
+<a class="skip-link" href="#tech-main">Skip to tech stack</a>
 <div class="page-shell">
-  <aside class="category-sidebar" aria-label="Categories">
+  <aside class="category-sidebar" id="tech-sidebarPanel" aria-label="Categories">
+    <button type="button" class="sidebar-close" id="tech-sidebarClose" aria-label="Close categories">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
     <div class="sidebar-title">Categories</div>
     <div class="category-tools" aria-label="Category tools">
       <label class="field" for="tech-categorySearch">
@@ -164,8 +185,13 @@ export const HUB_MARKUP = `<header class="hub-header">
     </div>
     <nav class="tabs" id="tech-tabs" aria-label="Technology categories"></nav>
   </aside>
+  <div class="sidebar-backdrop" id="tech-sidebarBackdrop" hidden></div>
 
   <section data-embedded-main="tech" id="tech-main">
+    <button type="button" class="sidebar-toggle" id="tech-sidebarToggle" aria-expanded="false" aria-controls="tech-sidebarPanel">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+      <span>Categories &amp; filters</span>
+    </button>
     <div id="tech-content"></div>
   </section>
 </div>
@@ -189,17 +215,18 @@ export const HUB_MARKUP = `<header class="hub-header">
 <footer class="directory-footer" aria-label="Technology directory footer">
   <div class="directory-footer-inner">
     <div class="directory-footer-brand">
-      <strong>ToolForge</strong>
-      <span id="tech-tech-footer-summary">1,861 technologies organized by developer-focused categories.</span>
+      <strong>ToolAtlas</strong>
+      <span id="tech-footer-summary">${stats.totalTech.toLocaleString()} technologies organized by developer-focused categories.</span>
     </div>
     <div class="directory-footer-actions">
       <button type="button" class="footer-action" data-footer-action="search">Search all</button>
       <button type="button" class="footer-action" data-footer-action="top">Back to top</button>
       <a href="/" class="footer-action" style="text-decoration:none">← Home</a>
-      <span class="footer-meta">Updated May 2026</span>
+      <span class="footer-meta">Updated ${stats.lastUpdatedLabel}</span>
     </div>
   </div>
 </footer>
 <button class="back-to-top" id="tech-backToTop" aria-label="Back to top">↑</button>
     </section>
   </main>`;
+}
