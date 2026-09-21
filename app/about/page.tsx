@@ -98,6 +98,7 @@ export default function About() {
           <div className="tech-grid">
             {TECH.map((t, i) => (
               <div className="tech-card reveal" key={t.name} style={{ "--delay": `${(i % 3) * 80}ms` }}>
+                <span className="card-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
                 <div className="tech-card-icon" aria-hidden="true"><t.icon width={22} height={22} /></div>
                 <div className="tech-card-name">{t.name}</div>
                 <p className="tech-card-desc">{t.desc}</p>
@@ -117,6 +118,7 @@ export default function About() {
           <div className="values-grid">
             {VALUES.map((v, i) => (
               <div className="value-card reveal" key={v.title} style={{ "--delay": `${(i % 2) * 80}ms` }}>
+                <span className="card-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
                 <div className="value-icon" aria-hidden="true"><v.icon width={22} height={22} /></div>
                 <div className="value-title">{v.title}</div>
                 <p className="value-desc">{v.desc}</p>
