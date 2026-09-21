@@ -59,7 +59,7 @@ export default function OpengraphImage() {
             skip the noise.
           </span>
         </div>
-        <div style={{ fontSize: "30px", color: "#c9c3b4", marginTop: "34px", maxWidth: "880px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", fontSize: "30px", color: "#c9c3b4", marginTop: "34px", maxWidth: "880px" }}>
           A hand-checked catalog of {stats.totalTools.toLocaleString()} AI tools and {stats.totalTech.toLocaleString()} developer technologies.
         </div>
         <div style={{ display: "flex", gap: "14px", marginTop: "48px" }}>
