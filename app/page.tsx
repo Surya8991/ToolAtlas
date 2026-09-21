@@ -231,13 +231,22 @@ export default function Home() {
             <h2 className="section-title reveal" id="ai-cats-heading" style={{ "--delay": "60ms" }}>{stats.totalTools.toLocaleString()} tools across every use case</h2>
             <p className="section-sub reveal" style={{ "--delay": "120ms" }}>From writing assistants to code copilots, discover AI tools organized by what they actually do.</p>
           </div>
-          <div className="categories-grid">
-            {AI_CATS.map((c, i) => (
-              <Link href={c.href} className="cat-card reveal" key={c.name} style={{ "--delay": `${(i % 4) * 50}ms` }}>
-                <div className="cat-icon" aria-hidden="true"><c.icon width={22} height={22} /></div>
-                <div className="cat-info"><div className="cat-name">{c.name}</div><div className="cat-count">{c.count}</div></div>
-              </Link>
-            ))}
+          <div className="legend-panel reveal">
+            <div className="legend-list">
+              {AI_CATS.map((c, i) => (
+                <Link
+                  href={c.href}
+                  className={`legend-row${c.name === "View all" ? " legend-row-all" : ""}`}
+                  key={c.name}
+                >
+                  <span className="legend-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="legend-icon" aria-hidden="true"><c.icon width={18} height={18} /></span>
+                  <span className="legend-name">{c.name}</span>
+                  <span className="legend-leader" aria-hidden="true" />
+                  <span className="legend-count">{c.count}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -250,13 +259,22 @@ export default function Home() {
             <h2 className="section-title reveal" id="tech-cats-heading" style={{ "--delay": "60ms" }}>{stats.totalTech.toLocaleString()} technologies, every layer of the stack</h2>
             <p className="section-sub reveal" style={{ "--delay": "120ms" }}>Languages, frameworks, databases, DevOps, cloud. Your entire stack reference in one place.</p>
           </div>
-          <div className="categories-grid">
-            {TECH_CATS.map((c, i) => (
-              <Link href="/hub#tech" className="cat-card reveal" key={c.name} style={{ "--delay": `${(i % 4) * 50}ms` }}>
-                <div className="cat-icon" aria-hidden="true"><c.icon width={22} height={22} /></div>
-                <div className="cat-info"><div className="cat-name">{c.name}</div><div className="cat-count">{c.count}</div></div>
-              </Link>
-            ))}
+          <div className="legend-panel reveal">
+            <div className="legend-list">
+              {TECH_CATS.map((c, i) => (
+                <Link
+                  href="/hub#tech"
+                  className={`legend-row${c.name === "View all" ? " legend-row-all" : ""}`}
+                  key={c.name}
+                >
+                  <span className="legend-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="legend-icon" aria-hidden="true"><c.icon width={18} height={18} /></span>
+                  <span className="legend-name">{c.name}</span>
+                  <span className="legend-leader" aria-hidden="true" />
+                  <span className="legend-count">{c.count}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
