@@ -1,6 +1,12 @@
 # ToolAtlas — Design / UI-UX / Content Improvement Plan
 
-_Last updated: 2026-09-18_
+_Last updated: 2026-09-21_
+
+**Status: all phases complete (H1–H5, M1–M3).** Everything in "Work plan" below is done
+and committed on `add-video-models` (not yet pushed as of this update). This document is
+kept as the design record — read it before touching the Hub sidebar, the Home legend
+panels, or the About/Contact index treatment, since each encodes a decision or a bug fix
+that's easy to accidentally undo.
 
 ## What this is (and what it is NOT)
 
@@ -157,24 +163,35 @@ design/structure pass, not a copy rewrite.
 
 ## Work plan (ordered, small batches)
 
-### Phase H — Hub (first)
-- **H1. Sidebar redesign.** Mobile drawer/bottom-sheet + "Filters" trigger; desktop
-  regroup/restyle utility actions + density. Preserve all dropdown/search/storage behaviour
-  and the known bug-fixes noted above. Verify desktop + 375px.
-- **H2. Nav-label breakpoint fix** (561–900px) so labels never vanish.
-- **H3. "Recommended views" compaction** so results sit higher.
-- **H4. Card polish** — tag wrap, compare checkbox, favourite button, density legibility.
-- **H5. Functionality sweep** — verify sort, filters, compare, Ctrl+K search, exports,
-  detail drawer; fix whatever's broken/confusing; add small wins (e.g. "recently added" sort)
-  only if low-risk.
+All ten batches below are done. Each was committed individually on `add-video-models`
+(`git log --oneline` for the exact diffs); commit hashes aren't repeated here since they
+change if the branch is ever rebased — go by the commit *message prefix* (`H1:`, `M2:`, etc.).
 
-### Phase M — Marketing pages (after Hub)
-- **M1. Authored SVG icon set** replacing all emoji-as-icons (nav, footer, home features,
-  About sections). One consistent stroke, `currentColor`.
-- **M2. Home restructure** — recast feature/category tiles from generic grid into the
-  cartographic legend/index language; keep hero compass-rose + copy.
-- **M3. About + Contact** — light structural refinement to match; keep the honest
-  maker's-note voice, mailto/no-backend truth, existing form a11y.
+### Phase H — Hub (first) ✅
+- **H1. Sidebar redesign.** ✅ Mobile drawer/bottom-sheet + "Filters" trigger; desktop
+  regroup/restyle utility actions + density. Preserved all dropdown/search/storage behaviour
+  and the known bug-fixes noted above. Verified desktop + 375px.
+- **H2. Nav-label breakpoint fix** ✅ (561–900px) — labels no longer vanish.
+- **H3. "Recommended views" compaction** ✅ — panel collapsed by default, results sit higher.
+- **H4. Card polish** ✅ — tag wrap, compare checkbox, favourite button, density legibility.
+- **H5. Functionality sweep** ✅ — sort/filters/compare/Ctrl+K/exports verified; fixed the
+  tool detail drawer's dead Save button.
+
+### Phase M — Marketing pages (after Hub) ✅
+- **M1. Authored SVG icon set** ✅ replacing all emoji-as-icons (nav, footer, home features,
+  About sections) — `components/icons.tsx`, ~28 icons, one consistent stroke/`currentColor`.
+  Folded in a deeper card-design pass at the same time (hover accent bars on `.tool-card`/
+  `.tech-card`/`.cat-card`/`.value-card`, matching icon-chip treatment everywhere).
+- **M2. Home restructure** ✅ — recast the AI/Tech category tiles from a same-size card grid
+  into a numbered "legend/index" panel (`.legend-panel`/`.legend-row`: index number, icon-as-
+  symbol, dotted leader, tabular-nums count). The bento Features grid was left as-is — it
+  already had span-2 variation and M1's hover spotlight, so it wasn't the "generic grid"
+  the audit flagged. Hero compass-rose and all copy unchanged.
+- **M3. About + Contact** ✅ — light pass only. Added the same numbered-index mark (`.card-index`
+  on About's tech/value cards, `.contact-method-index` on Contact's method rows) to tie those
+  pages into the legend language M2 established, without restructuring their content (tech/value
+  cards carry a paragraph each; contact methods are too few to read as a list). Copy, voice,
+  mailto/no-backend truth, and existing form a11y untouched.
 
 ### Constraints (every batch)
 - Zero new npm dependencies (`next`/`react`/`react-dom` + types + typescript only).

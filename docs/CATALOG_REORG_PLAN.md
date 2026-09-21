@@ -1,7 +1,14 @@
 # ToolAtlas Catalog Reorganization — Implementation Plan
 
-**Status:** Proposal — no data files changed yet.
-**Scope:** `public/data/tools-data.js` taxonomy only (tech-data.js categories are not covered here).
+**Status:** ✅ Executed. All four parts below (department grouping, Security & Trust
+split, Useful Websites/Resources consolidation, Browser Extensions dissolution) are live
+in `public/data/tools-data.js` — verified 2026-09-21: `dept-*` tabs exist for all 9
+departments, the 7 Security subcategories (`tool-cat-sec-*`) match the counts in Part 2
+exactly (78/41/53/60/57/21/3), Resources & Directories has the 8 subcategories from Part 3
+(`tool-cat-uw-*`), no tool is left on a browser-extension category, and 118 tools carry
+`delivery_format`. The plan below is kept as the design record of *why* the taxonomy looks
+the way it does, not as a pending to-do.
+**Scope:** `public/data/tools-data.js` taxonomy only (tech-data.js categories are not covered here — see the "Tech category id aliases" gotcha in `agents.md`).
 **Author:** Drafted by Claude, based on a live audit of the current 2,324-tool catalog (2026-09-18).
 
 ## Why
