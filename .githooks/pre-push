@@ -1,0 +1,16 @@
+#!/bin/sh
+# Master-Tools-Hub (ToolAtlas) pre-push gate. Guards (main-branch, identity, secrets) come from
+# lib/guards.sh; the checks below are specific to this project (Next.js 15, no ESLint config, no tests).
+# Enable once per clone: git config core.hooksPath .githooks   (see README.md)
+HOOK_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$HOOK_DIR/lib/guards.sh"
+pp_init "$@"
+pp_run_guards || exit 1
+pp_should_check || exit 0
+
+# No ESLint config exists here (`next lint` would prompt interactively), so
+# lint is intentionally absent until one is added.
+pp_require_node_modules
+pp_step "typecheck"         npx --no -- tsc --noEmit
+pp_step "production build"  npm run build
+pp_done
